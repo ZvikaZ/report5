@@ -1,10 +1,15 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
+
 // TODO make sure that users outside of the list are disabled, and have proper notification
 // TODO why loading is slow?
 // TODO use DB to persist
-// TODO work from other computer/phone
-// TODO work from GH pages
+// TODO phone's back completely exits
+// TODO reduce size of Issues table when empty (because of phone's keyboard)
+// TODO always show 'fixed'
+// TODO disable column moving in Issues
+// TODO חוסרים isn't a good name ; write explictly to write how many exists
+// TODO no need for arrows in צ numbers, default value in other numbers
 // TODO don't accept empty answers
 
 import "@mantine/core/styles.css";

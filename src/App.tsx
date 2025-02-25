@@ -8,9 +8,10 @@
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO always show 'fixed'
 // TODO disable column moving in Issues
-// TODO חוסרים isn't a good name ; write explictly to write how many exists
 // TODO no need for arrows in צ numbers, default value in other numbers
 // TODO don't accept empty answers
+// TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
+// TODO verify 'git push' triggers deployment
 
 import "@mantine/core/styles.css";
 import { Button, Container, MantineProvider, Stack } from "@mantine/core";

@@ -126,7 +126,7 @@ export const questionsData = {
       ],
     },
     {
-      screen: "חוסרים",
+      screen: "ציוד (כמה יש)",
       questions: [
         { type: "boolean", text: "ערכת עזרה ראשונה" },
         { type: "boolean", text: 'פק"ל היגיינה' },

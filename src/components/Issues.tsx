@@ -17,7 +17,6 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
     creationDate: getCurrentDate(),
   };
 
-  // Initialize rowData with the value prop (if it exists) and append a copy of newRow
   const [rowData, setRowData] = useState(
     value ? [...value, { ...newRow }] : [{ ...newRow }],
   );
@@ -32,7 +31,9 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
       minWidth: 150,
       wrapText: true,
       autoHeight: true,
-      cellStyle: { display: "flex", alignItems: "center" }, // Center vertically
+      suppressMovable: true, // Disable dragging
+      resizable: false, // Disable resizing
+      cellStyle: { display: "flex", alignItems: "center" },
       cellRenderer: (params) => {
         const isLastRow = params.node.rowIndex === rowData.length - 1;
         const isPlaceholder = params.value === newRow.failure;
@@ -43,10 +44,10 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
           border: "none",
           width: "100%",
           height: "100%",
-          whiteSpace: "normal", // Enable text wrapping
-          lineHeight: "1.3", // Reduce space between wrapped lines (default is usually ~1.5)
-          display: "flex", // Center vertically
-          alignItems: "center", // Center vertically
+          whiteSpace: "normal",
+          lineHeight: "1.3",
+          display: "flex",
+          alignItems: "center",
         };
         return <div style={style}>{params.value}</div>;
       },
@@ -66,10 +67,12 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
       headerName: "תוקן",
       editable: true,
       width: 60,
+      suppressMovable: true, // Disable dragging
+      resizable: false, // Disable resizing
       cellStyle: (params) => ({
         textAlign: "center",
-        display: "flex", // Center vertically
-        alignItems: "center", // Center vertically
+        display: "flex",
+        alignItems: "center",
         visibility:
           params.node.rowIndex === rowData.length - 1 ? "hidden" : "visible",
       }),
@@ -118,8 +121,8 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
         enableRtl={true}
         singleClickEdit={true}
         stopEditingWhenCellsLoseFocus={true}
-        rowHeight={40} // Original default row height
-        autoHeight={true} // Keep dynamic row height for long text
+        rowHeight={40}
+        autoHeight={true}
       />
     </div>
   );

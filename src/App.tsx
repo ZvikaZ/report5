@@ -1,20 +1,15 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO verify 'git push' triggers deployment
-
-// TODO disable phone's back
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
-// TODO disable column moving in Issues
-// TODO no need for arrows in צ numbers, default value in other numbers
 
 // TODO use DB to persist
+// TODO make sure that שצל always start at 0
 // TODO make sure that users outside of the list are disabled, and have proper notification
+// TODO react router (w/ grok)
 
 // TODO AG Grid: invalid gridOptions property 'autoHeight'
 // TODO separate DBs for prod and dev, with indication for dev
-// TODO don't accept empty answers
-// TODO react router (w/ grok), and re-enable phone's back
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA
 // TODO clean warnings

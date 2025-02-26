@@ -62,8 +62,9 @@ export function Fill({ onFinish }) {
       case "number":
         return (
           <NumberInput
-            value={answers[question.text] || ""}
+            value={answers[question.text] || (question.fixed ? "" : 0)}
             description={question.description}
+            hideControls={question.fixed}
             onChange={(val) => handleAnswerChange(question.text, val)}
           />
         );

@@ -1,17 +1,22 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO make sure that users outside of the list are disabled, and have proper notification
-// TODO why loading is slow?
-// TODO use DB to persist
-// TODO phone's back completely exits
+// TODO verify 'git push' triggers deployment
+
+// TODO disable phone's back
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
-// TODO always show 'fixed'
+// TODO always show 'fixed' instead of 'days'
 // TODO disable column moving in Issues
 // TODO no need for arrows in צ numbers, default value in other numbers
+
+// TODO use DB to persist
+// TODO make sure that users outside of the list are disabled, and have proper notification
+
+// TODO separate DBs for prod and dev, with indication for dev
 // TODO don't accept empty answers
+// TODO react router (w/ grok), and re-enable phone's back
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
-// TODO verify 'git push' triggers deployment
+// TODO PWA
 
 import "@mantine/core/styles.css";
 import { Button, Container, MantineProvider, Stack } from "@mantine/core";

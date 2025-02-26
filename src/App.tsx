@@ -2,9 +2,9 @@
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
 // TODO use DB to persist
-// TODO make sure that שצל always start at 0
 // TODO make sure that users outside of the list are disabled, and have proper notification
 // TODO react router (w/ grok)
+// TODO make sure that שצל always start at 0
 
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev

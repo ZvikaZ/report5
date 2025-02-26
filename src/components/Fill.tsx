@@ -65,6 +65,8 @@ export function Fill({ onFinish }) {
             value={answers[question.text] || (question.fixed ? "" : 0)}
             description={question.description}
             hideControls={question.fixed}
+            allowNegative={false}
+            min={0}
             onChange={(val) => handleAnswerChange(question.text, val)}
           />
         );

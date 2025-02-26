@@ -122,7 +122,6 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
         singleClickEdit={true}
         stopEditingWhenCellsLoseFocus={true}
         rowHeight={40}
-        autoHeight={true}
       />
     </div>
   );

@@ -1,14 +1,12 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO reduce size of Issues table when empty (because of phone's keyboard)
-
 // TODO use DB to persist
 // TODO make sure that שצל always start at 0
 // TODO make sure that users outside of the list are disabled, and have proper notification
 // TODO react router (w/ grok)
 
-// TODO AG Grid: invalid gridOptions property 'autoHeight'
+// TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA

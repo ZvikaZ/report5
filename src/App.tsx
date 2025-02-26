@@ -5,7 +5,6 @@
 
 // TODO disable phone's back
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
-// TODO always show 'fixed' instead of 'days'
 // TODO disable column moving in Issues
 // TODO no need for arrows in צ numbers, default value in other numbers
 

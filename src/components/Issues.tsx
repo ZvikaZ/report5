@@ -62,26 +62,6 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
       },
     },
     {
-      field: "days",
-      headerName: "ימים",
-      width: 80,
-      cellStyle: (params) => ({
-        textAlign: "center",
-        display: "flex",
-        alignItems: "center",
-        visibility:
-          params.node.rowIndex === rowData.length - 1 ? "hidden" : "visible", // Hide for the new row
-      }),
-      valueGetter: (params) => {
-        if (params.data.creationDate) {
-          return (
-            differenceInDays(getCurrentDate(), params.data.creationDate) + 1
-          );
-        }
-        return 1; // Default value for rows without creationDate
-      },
-    },
-    {
       field: "fixed",
       headerName: "תוקן",
       editable: true,

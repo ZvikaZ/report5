@@ -12,11 +12,13 @@
 // TODO use DB to persist
 // TODO make sure that users outside of the list are disabled, and have proper notification
 
+// TODO AG Grid: invalid gridOptions property 'autoHeight'
 // TODO separate DBs for prod and dev, with indication for dev
 // TODO don't accept empty answers
 // TODO react router (w/ grok), and re-enable phone's back
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA
+// TODO clean warnings
 
 import "@mantine/core/styles.css";
 import { Button, Container, MantineProvider, Stack } from "@mantine/core";

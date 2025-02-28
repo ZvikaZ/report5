@@ -309,7 +309,10 @@ export function Fill({ user, onFinish }) {
         {activeScreen < questionsData.screens.length - 1 ? (
           <Button
             onClick={nextScreen}
-            disabled={activeScreen === questionsData.screens.length - 1}
+            disabled={
+              !answers["צ. הטנק"] ||
+              activeScreen === questionsData.screens.length - 1
+            }
           >
             הבא
           </Button>

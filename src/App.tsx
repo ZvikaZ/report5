@@ -1,8 +1,6 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO block 'next' if missing tank's Z
-
 // TODO make sure that users outside of the list are disabled, and have proper notification
 // TODO make sure that שצל always start at 0
 // TODO react router (w/ grok)

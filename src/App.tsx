@@ -8,6 +8,7 @@
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA
 // TODO clean warnings
+// TODO replace favicon
 
 import "@mantine/core/styles.css";
 import { Button, Container, MantineProvider, Stack } from "@mantine/core";

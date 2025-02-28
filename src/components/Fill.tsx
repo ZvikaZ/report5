@@ -78,6 +78,15 @@ const generateDefaultAnswers = (tankId = null) => {
   return defaultAnswers;
 };
 
+const filterAnswers = (answers) => {
+  for (const key in answers) {
+    if (Array.isArray(answers[key])) {
+      answers[key] = answers[key].filter((item) => !item.fixed);
+    }
+  }
+  return answers;
+};
+
 export function Fill({ user, onFinish }) {
   const [activeScreen, setActiveScreen] = useState(0);
   const [answers, setAnswers] = useState(generateDefaultAnswers());
@@ -121,7 +130,9 @@ export function Fill({ user, onFinish }) {
     const fetchLatestStatus = async () => {
       const tankId = answers["צ. הטנק"];
       if (tankId) {
-        const latestStatus = await getLatestTankStatusEntry(tankId);
+        const latestStatus = filterAnswers(
+          await getLatestTankStatusEntry(tankId),
+        );
         if (latestStatus) {
           setAnswers((prev) => ({
             ...prev,

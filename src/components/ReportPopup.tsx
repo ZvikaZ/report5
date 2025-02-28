@@ -43,10 +43,20 @@ ${answers["סוללות AA"]}/1 טריפל איי
 ${answers["סוללות AAA"]}/1 דאבל איי
 
 תקלות חימוש:
-${answers["תקלות חימוש"]?.map((item) => "- " + item.failure).join("\n") || ""}
+${
+  answers["תקלות חימוש"]
+    ?.filter((item) => !item.fixed)
+    .map((item) => "- " + item.failure)
+    .join("\n") || ""
+}
 
 תקלות קשר:
-${answers["תקלות קשר"]?.map((item) => "- " + item.failure).join("\n") || ""}
+${
+  answers["תקלות קשר"]
+    ?.filter((item) => !item.fixed)
+    .map((item) => "- " + item.failure)
+    .join("\n") || ""
+}
 
 פערים/חוסרים ודרישות:
 

@@ -3,13 +3,16 @@
 
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev
-// TODO remove the 'undefined' entry from answers in DB
 // TODO when finished filling, and clicking back - return to start of fill
 
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA
 // TODO clean warnings
 // TODO replace favicon
+
+// TODO upload questions to DB
+// TODO km and hours shouldnt decrease, and Z shouldn't change, unless warning issued
+// TODO remove the 'undefined' entry from answers in DB
 
 import "@mantine/core/styles.css";
 import { Button, Container, MantineProvider, Stack } from "@mantine/core";

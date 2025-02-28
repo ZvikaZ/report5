@@ -73,11 +73,15 @@ const getDefaultValue = (question) => {
   return defaults[question.type];
 };
 
+const getQuestionKey = (question) =>
+  question.text ?? question.topic ?? `question_${question.type}`;
+
 const generateDefaultAnswers = (tankId = null) => {
   const defaultAnswers = {};
   questionsData.screens.forEach((screen) => {
     screen.questions.forEach((question) => {
-      defaultAnswers[question.text] = getDefaultValue(question);
+      const key = getQuestionKey(question); // Now uses getQuestionKey
+      defaultAnswers[key] = getDefaultValue(question);
     });
   });
   if (tankId) {
@@ -109,38 +113,40 @@ const Screen = ({
     useDisclosure(false);
 
   const renderInput = (question) => {
-    if (answers[question.text] === undefined) {
-      handleAnswerChange(question.text, getDefaultValue(question));
+    const key = getQuestionKey(question);
+
+    if (answers[key] === undefined) {
+      handleAnswerChange(key, getDefaultValue(question));
     }
 
     switch (question.type) {
       case "text":
         return (
           <TextInput
-            value={answers[question.text] || ""}
+            value={answers[key] || ""}
             description={question.description}
-            onChange={(e) => handleAnswerChange(question.text, e.target.value)}
+            onChange={(e) => handleAnswerChange(key, e.target.value)}
           />
         );
       case "long-text":
         return (
           <Textarea
-            value={answers[question.text] || ""}
+            value={answers[key] || ""}
             autosize
             minRows={5}
             description={question.description}
-            onChange={(e) => handleAnswerChange(question.text, e.target.value)}
+            onChange={(e) => handleAnswerChange(key, e.target.value)}
           />
         );
       case "number":
         return (
           <NumberInput
-            value={answers[question.text] ?? getDefaultValue(question)}
+            value={answers[key] ?? getDefaultValue(question)}
             description={question.description}
             hideControls={question.fixed}
             allowNegative={false}
             min={0}
-            onChange={(val) => handleAnswerChange(question.text, val)}
+            onChange={(val) => handleAnswerChange(key, val)}
             onFocus={(e) => {
               if (e.target.value === "0") {
                 e.target.value = "";
@@ -151,13 +157,11 @@ const Screen = ({
       case "boolean":
         return (
           <Checkbox
-            checked={answers[question.text] || false}
+            checked={answers[key] || false}
             label={question.text}
             description={question.description}
             color={question.color}
-            onChange={(e) =>
-              handleAnswerChange(question.text, e.target.checked)
-            }
+            onChange={(e) => handleAnswerChange(key, e.target.checked)}
           />
         );
       case "issues":
@@ -166,16 +170,16 @@ const Screen = ({
             key={`issues-${question.topic}-${screenIndex}`}
             topic={question.topic}
             singleIssue={question.singleIssue}
-            value={answers[question.topic] || []}
-            onChange={(value) => handleAnswerChange(question.topic, value)}
+            value={answers[key] || []}
+            onChange={(value) => handleAnswerChange(key, value)}
           />
         );
       case "select":
         return (
           <Select
-            value={answers[question.text] || ""}
+            value={answers[key] || ""}
             description={question.description}
-            onChange={(value) => handleAnswerChange(question.text, value)}
+            onChange={(value) => handleAnswerChange(key, value)}
             data={question.options}
           />
         );
@@ -234,10 +238,7 @@ const Screen = ({
 
       <Card shadow="sm" padding="lg" style={{ marginTop: "20px" }}>
         {questionsData.screens[screenIndex].questions.map((question) => (
-          <div
-            key={question.text ?? question.type}
-            style={{ marginBottom: "20px" }}
-          >
+          <div key={getQuestionKey(question)} style={{ marginBottom: "20px" }}>
             {question.type !== "boolean" && (
               <Text size="md" weight={500} style={{ marginBottom: "10px" }}>
                 {question.text}

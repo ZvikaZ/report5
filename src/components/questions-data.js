@@ -1,6 +1,3 @@
-//TODO upload to DB
-//TODO km and hours shouldnt decrease, unless warning issued
-
 export const questionsData = {
   screens: [
     {

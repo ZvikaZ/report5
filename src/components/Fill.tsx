@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Badge,
   Button,
@@ -51,11 +51,91 @@ async function getLatestTankStatusEntry(tankId) {
   return doc ? doc.data() : null;
 }
 
+// Define default values once
+const getDefaultValue = (question) => {
+  const defaults = {
+    text: "",
+    "long-text": "",
+    number: question.fixed ? "" : 0,
+    boolean: false,
+    select: "",
+    issues: [],
+  };
+  return defaults[question.type];
+};
+
+// Function to generate default answers object
+const generateDefaultAnswers = (tankId = null) => {
+  const defaultAnswers = {};
+  questionsData.screens.forEach((screen) => {
+    screen.questions.forEach((question) => {
+      defaultAnswers[question.text] = getDefaultValue(question);
+    });
+  });
+  if (tankId) {
+    defaultAnswers["צ. הטנק"] = tankId;
+  }
+  return defaultAnswers;
+};
+
 export function Fill({ user, onFinish }) {
   const [activeScreen, setActiveScreen] = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState(generateDefaultAnswers());
   const [popupOpened, { open: openPopup, close: closePopup }] =
     useDisclosure(false);
+
+  async function getUsersPrevTank(user) {
+    try {
+      const q = query(
+        collection(db, "tankStatus"),
+        where("user", "==", user.email),
+        orderBy("timestamp", "desc"),
+        limit(1),
+      );
+      const snapshot = await getDocs(q);
+      const doc = snapshot.docs[0];
+      return doc ? doc.data().tankId : null;
+    } catch (e) {
+      console.error("Error getting previous tank:", e);
+      return null;
+    }
+  }
+
+  // Initialize answers with previous tank
+  useEffect(() => {
+    const initializeAnswers = async () => {
+      // Get previous tank ID
+      const prevTankId = await getUsersPrevTank(user);
+      if (prevTankId) {
+        setAnswers((prev) => ({
+          ...prev,
+          "צ. הטנק": prevTankId,
+        }));
+      }
+    };
+    initializeAnswers();
+  }, [user]);
+
+  // Update answers when tankId changes
+  useEffect(() => {
+    const fetchLatestStatus = async () => {
+      const tankId = answers["צ. הטנק"];
+      if (tankId) {
+        const latestStatus = await getLatestTankStatusEntry(tankId);
+        if (latestStatus) {
+          setAnswers((prev) => ({
+            ...prev,
+            ...latestStatus,
+            "צ. הטנק": tankId, // Ensure tankId remains
+          }));
+        } else {
+          // Reset all fields to default values if no status found
+          setAnswers(generateDefaultAnswers(tankId));
+        }
+      }
+    };
+    fetchLatestStatus();
+  }, [answers["צ. הטנק"]]);
 
   const handleAnswerChange = (questionId, value) => {
     setAnswers((prev) => ({
@@ -75,6 +155,14 @@ export function Fill({ user, onFinish }) {
   };
 
   const renderInput = (question) => {
+    // Set default value if not already set
+    if (answers[question.text] === undefined) {
+      setAnswers((prev) => ({
+        ...prev,
+        [question.text]: getDefaultValue(question),
+      }));
+    }
+
     switch (question.type) {
       case "text":
         return (
@@ -97,7 +185,7 @@ export function Fill({ user, onFinish }) {
       case "number":
         return (
           <NumberInput
-            value={answers[question.text] || (question.fixed ? "" : 0)}
+            value={answers[question.text] ?? getDefaultValue(question)}
             description={question.description}
             hideControls={question.fixed}
             allowNegative={false}
@@ -108,7 +196,7 @@ export function Fill({ user, onFinish }) {
       case "boolean":
         return (
           <Checkbox
-            value={answers[question.text] || ""}
+            checked={answers[question.text] || false}
             label={question.text}
             description={question.description}
             color={question.color}
@@ -123,7 +211,7 @@ export function Fill({ user, onFinish }) {
             key={`issues-${question.topic}-${activeScreen}`}
             topic={question.topic}
             singleIssue={question.singleIssue}
-            value={answers[question.topic]}
+            value={answers[question.topic] || []}
             onChange={(value) => handleAnswerChange(question.topic, value)}
           />
         );

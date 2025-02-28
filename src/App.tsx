@@ -1,7 +1,6 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO use DB to persist
 // TODO block 'next' if missing tank's Z
 // TODO fix undefined in whatsapp report
 

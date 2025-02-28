@@ -1,7 +1,6 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO make sure that שצל always start at 0
 // TODO react router (w/ grok)
 // TODO missing react key in Issues
 

@@ -1,3 +1,5 @@
+// TODO make tankId and שצל references generic (according to questions data from DB)
+
 import { useState, useEffect } from "react";
 import {
   Badge,
@@ -80,7 +82,9 @@ const generateDefaultAnswers = (tankId = null) => {
 
 const filterAnswers = (answers) => {
   for (const key in answers) {
-    if (Array.isArray(answers[key])) {
+    if (key.includes("שצל")) {
+      answers[key] = 0;
+    } else if (Array.isArray(answers[key])) {
       answers[key] = answers[key].filter((item) => !item.fixed);
     }
   }

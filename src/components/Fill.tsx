@@ -12,11 +12,46 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import {
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  addDoc,
+} from "firebase/firestore";
+
 import { questionsData } from "./questions-data.js";
 import { Issues } from "./Issues.tsx";
 import { ReportPopup } from "./ReportPopup.tsx";
+import { db } from "../firebaseConfig.ts";
 
-export function Fill({ onFinish }) {
+const saveData = async (key, value) => {
+  try {
+    console.log("saving", { key, value });
+    const docRef = await addDoc(collection(db, key), value);
+    console.log("Document written with ID: ", docRef.id, docRef);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+};
+
+async function getLatestTankStatusEntry(tankId) {
+  const q = query(
+    collection(db, "tankStatus"),
+    where("tankId", "==", tankId),
+    orderBy("timestamp", "desc"),
+    limit(1),
+  );
+
+  const snapshot = await getDocs(q);
+  const doc = snapshot.docs[0];
+  return doc ? doc.data() : null;
+}
+
+export function Fill({ user, onFinish }) {
   const [activeScreen, setActiveScreen] = useState(0);
   const [answers, setAnswers] = useState({});
   const [popupOpened, { open: openPopup, close: closePopup }] =
@@ -122,6 +157,14 @@ export function Fill({ onFinish }) {
   const onFinishClick = () => {
     openPopup();
     onFinish();
+    saveData("tankStatus", {
+      ...answers,
+      tankId: answers["צ. הטנק"],
+      timestamp: serverTimestamp(),
+      //TODO
+      user: user.email,
+      displayName: user.displayName ?? "John Doe",
+    });
   };
 
   return (

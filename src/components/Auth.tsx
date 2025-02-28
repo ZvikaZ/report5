@@ -11,7 +11,7 @@ import {
   Auth as FirebaseAuth,
   AuthError,
 } from "firebase/auth";
-import app from "../firebaseConfig.ts";
+import { app } from "../firebaseConfig.ts";
 import { Button, Loader, Avatar, Text, Alert, Group } from "@mantine/core";
 import { IconBrandGoogle, IconLogout } from "@tabler/icons-react";
 

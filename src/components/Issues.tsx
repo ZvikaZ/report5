@@ -31,12 +31,13 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
       minWidth: 150,
       wrapText: true,
       autoHeight: true,
-      suppressMovable: true, // Disable dragging
-      resizable: false, // Disable resizing
+      suppressMovable: true,
+      resizable: false,
       cellStyle: { display: "flex", alignItems: "center" },
       cellRenderer: (params) => {
         const isLastRow = params.node.rowIndex === rowData.length - 1;
         const isPlaceholder = params.value === newRow.failure;
+
         const style = {
           fontStyle: isLastRow && isPlaceholder ? "italic" : "normal",
           backgroundColor: isLastRow && isPlaceholder ? "#f5f5f5" : "white",
@@ -48,6 +49,8 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
           lineHeight: "1.3",
           display: "flex",
           alignItems: "center",
+          textDecoration:
+            params.data.fixed && !isPlaceholder ? "line-through" : "none",
         };
         return <div style={style}>{params.value}</div>;
       },
@@ -67,8 +70,8 @@ const Issues = ({ topic, singleIssue, value, onChange }) => {
       headerName: "תוקן",
       editable: true,
       width: 60,
-      suppressMovable: true, // Disable dragging
-      resizable: false, // Disable resizing
+      suppressMovable: true,
+      resizable: false,
       cellStyle: (params) => ({
         textAlign: "center",
         display: "flex",

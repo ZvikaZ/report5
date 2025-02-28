@@ -2,7 +2,7 @@
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
 // TODO block 'next' if missing tank's Z
-// TODO fix undefined in whatsapp report
+// TODO 'fixed' in Issues
 
 // TODO make sure that users outside of the list are disabled, and have proper notification
 // TODO make sure that שצל always start at 0

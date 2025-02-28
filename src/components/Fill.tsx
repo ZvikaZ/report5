@@ -24,6 +24,14 @@ import {
   getDocs,
   addDoc,
 } from "firebase/firestore";
+import {
+  useNavigate,
+  useParams,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+} from "react-router-dom";
 
 import { questionsData } from "./questions-data.js";
 import { Issues } from "./Issues.tsx";
@@ -53,7 +61,6 @@ async function getLatestTankStatusEntry(tankId) {
   return doc ? doc.data() : null;
 }
 
-// Define default values once
 const getDefaultValue = (question) => {
   const defaults = {
     text: "",
@@ -66,7 +73,6 @@ const getDefaultValue = (question) => {
   return defaults[question.type];
 };
 
-// Function to generate default answers object
 const generateDefaultAnswers = (tankId = null) => {
   const defaultAnswers = {};
   questionsData.screens.forEach((screen) => {
@@ -91,91 +97,20 @@ const filterAnswers = (answers) => {
   return answers;
 };
 
-export function Fill({ user, onFinish }) {
-  const [activeScreen, setActiveScreen] = useState(0);
-  const [answers, setAnswers] = useState(generateDefaultAnswers());
+const Screen = ({
+  screenIndex,
+  answers,
+  handleAnswerChange,
+  user,
+  onFinish,
+}) => {
+  const navigate = useNavigate();
   const [popupOpened, { open: openPopup, close: closePopup }] =
     useDisclosure(false);
 
-  async function getUsersPrevTank(user) {
-    try {
-      const q = query(
-        collection(db, "tankStatus"),
-        where("user", "==", user.email),
-        orderBy("timestamp", "desc"),
-        limit(1),
-      );
-      const snapshot = await getDocs(q);
-      const doc = snapshot.docs[0];
-      return doc ? doc.data().tankId : null;
-    } catch (e) {
-      console.error("Error getting previous tank:", e);
-      return null;
-    }
-  }
-
-  // Initialize answers with previous tank
-  useEffect(() => {
-    const initializeAnswers = async () => {
-      // Get previous tank ID
-      const prevTankId = await getUsersPrevTank(user);
-      if (prevTankId) {
-        setAnswers((prev) => ({
-          ...prev,
-          "צ. הטנק": prevTankId,
-        }));
-      }
-    };
-    initializeAnswers();
-  }, [user]);
-
-  // Update answers when tankId changes
-  useEffect(() => {
-    const fetchLatestStatus = async () => {
-      const tankId = answers["צ. הטנק"];
-      if (tankId) {
-        const latestStatus = filterAnswers(
-          await getLatestTankStatusEntry(tankId),
-        );
-        if (latestStatus) {
-          setAnswers((prev) => ({
-            ...prev,
-            ...latestStatus,
-            "צ. הטנק": tankId, // Ensure tankId remains
-          }));
-        } else {
-          // Reset all fields to default values if no status found
-          setAnswers(generateDefaultAnswers(tankId));
-        }
-      }
-    };
-    fetchLatestStatus();
-  }, [answers["צ. הטנק"]]);
-
-  const handleAnswerChange = (questionId, value) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-  };
-
-  const nextScreen = () => {
-    setActiveScreen((current) =>
-      current < questionsData.screens.length - 1 ? current + 1 : current,
-    );
-  };
-
-  const prevScreen = () => {
-    setActiveScreen((current) => (current > 0 ? current - 1 : current));
-  };
-
   const renderInput = (question) => {
-    // Set default value if not already set
     if (answers[question.text] === undefined) {
-      setAnswers((prev) => ({
-        ...prev,
-        [question.text]: getDefaultValue(question),
-      }));
+      handleAnswerChange(question.text, getDefaultValue(question));
     }
 
     switch (question.type) {
@@ -228,7 +163,7 @@ export function Fill({ user, onFinish }) {
       case "issues":
         return (
           <Issues
-            key={`issues-${question.topic}-${activeScreen}`}
+            key={`issues-${question.topic}-${screenIndex}`}
             topic={question.topic}
             singleIssue={question.singleIssue}
             value={answers[question.topic] || []}
@@ -263,16 +198,15 @@ export function Fill({ user, onFinish }) {
   };
 
   const onFinishClick = () => {
-    openPopup();
-    onFinish();
     saveData("tankStatus", {
       ...answers,
       tankId: answers["צ. הטנק"],
       timestamp: serverTimestamp(),
-      //TODO
       user: user.email,
       displayName: user.displayName ?? "John Doe",
     });
+    openPopup();
+    onFinish();
   };
 
   return (
@@ -295,11 +229,11 @@ export function Fill({ user, onFinish }) {
           },
         }}
       >
-        {`${activeScreen + 1}. ${questionsData.screens[activeScreen].screen}`}
+        {`${screenIndex + 1}. ${questionsData.screens[screenIndex].screen}`}
       </Badge>
 
       <Card shadow="sm" padding="lg" style={{ marginTop: "20px" }}>
-        {questionsData.screens[activeScreen].questions.map((question) => (
+        {questionsData.screens[screenIndex].questions.map((question) => (
           <div key={question.text} style={{ marginBottom: "20px" }}>
             {question.type !== "boolean" && (
               <Text size="md" weight={500} style={{ marginBottom: "10px" }}>
@@ -312,16 +246,18 @@ export function Fill({ user, onFinish }) {
       </Card>
 
       <Group position="center" style={{ marginTop: "20px" }}>
-        <Button onClick={prevScreen} disabled={activeScreen === 0}>
+        <Button
+          onClick={() =>
+            navigate(screenIndex > 0 ? `/fill/${screenIndex}` : "/fill/1")
+          }
+          disabled={screenIndex === 0}
+        >
           הקודם
         </Button>
-        {activeScreen < questionsData.screens.length - 1 ? (
+        {screenIndex < questionsData.screens.length - 1 ? (
           <Button
-            onClick={nextScreen}
-            disabled={
-              !answers["צ. הטנק"] ||
-              activeScreen === questionsData.screens.length - 1
-            }
+            onClick={() => navigate(`/fill/${screenIndex + 2}`)}
+            disabled={!answers["צ. הטנק"]}
           >
             הבא
           </Button>
@@ -334,9 +270,97 @@ export function Fill({ user, onFinish }) {
           onClose={closePopup}
           answers={answers}
           onFinishClick={onFinishClick}
-          showButton={activeScreen === questionsData.screens.length - 1}
-        />{" "}
+          showButton={screenIndex === questionsData.screens.length - 1}
+        />
       </Group>
     </div>
+  );
+};
+
+export function Fill({ user, onFinish }) {
+  const { screenId } = useParams();
+  const navigate = useNavigate();
+  const [answers, setAnswers] = useState(generateDefaultAnswers());
+
+  async function getUsersPrevTank(user) {
+    try {
+      const q = query(
+        collection(db, "tankStatus"),
+        where("user", "==", user.email),
+        orderBy("timestamp", "desc"),
+        limit(1),
+      );
+      const snapshot = await getDocs(q);
+      const doc = snapshot.docs[0];
+      return doc ? doc.data().tankId : null;
+    } catch (e) {
+      console.error("Error getting previous tank:", e);
+      return null;
+    }
+  }
+
+  useEffect(() => {
+    const initializeAnswers = async () => {
+      const prevTankId = await getUsersPrevTank(user);
+      if (prevTankId) {
+        setAnswers((prev) => ({
+          ...prev,
+          "צ. הטנק": prevTankId,
+        }));
+      }
+    };
+    initializeAnswers();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchLatestStatus = async () => {
+      const tankId = answers["צ. הטנק"];
+      if (tankId) {
+        const latestStatus = filterAnswers(
+          await getLatestTankStatusEntry(tankId),
+        );
+        if (latestStatus) {
+          setAnswers((prev) => ({
+            ...prev,
+            ...latestStatus,
+            "צ. הטנק": tankId,
+          }));
+        } else {
+          setAnswers(generateDefaultAnswers(tankId));
+        }
+      }
+    };
+    fetchLatestStatus();
+  }, [answers["צ. הטנק"]]);
+
+  const handleAnswerChange = (questionId, value) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: value,
+    }));
+  };
+
+  // Convert screenId to number and adjust for 1-based indexing
+  const currentScreenIndex = screenId ? parseInt(screenId) - 1 : 0;
+
+  return (
+    <Routes>
+      {questionsData.screens.map((_, index) => (
+        <Route
+          key={index}
+          path={`${index + 1}`}
+          element={
+            <Screen
+              screenIndex={index}
+              answers={answers}
+              handleAnswerChange={handleAnswerChange}
+              user={user}
+              onFinish={onFinish}
+            />
+          }
+        />
+      ))}
+      <Route path="" element={<Navigate to="/fill/1" replace />} />
+    </Routes>
   );
 }

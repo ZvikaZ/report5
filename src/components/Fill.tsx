@@ -202,6 +202,11 @@ export function Fill({ user, onFinish }) {
             allowNegative={false}
             min={0}
             onChange={(val) => handleAnswerChange(question.text, val)}
+            onFocus={(e) => {
+              if (e.target.value === "0") {
+                e.target.value = "";
+              }
+            }}
           />
         );
       case "boolean":

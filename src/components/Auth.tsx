@@ -1,5 +1,3 @@
-//TODO make the photo smaller, and in the same line
-
 import { useState, useEffect } from "react";
 import { Dispatch, SetStateAction } from "react";
 import {
@@ -11,9 +9,22 @@ import {
   Auth as FirebaseAuth,
   AuthError,
 } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { app } from "../firebaseConfig.ts";
-import { Button, Loader, Avatar, Text, Alert, Group } from "@mantine/core";
-import { IconBrandGoogle, IconLogout } from "@tabler/icons-react";
+import {
+  Button,
+  Loader,
+  Avatar,
+  Text,
+  Alert,
+  Group,
+  Notification,
+} from "@mantine/core";
+import {
+  IconBrandGoogle,
+  IconLogout,
+  IconAlertCircle,
+} from "@tabler/icons-react";
 
 const Auth = ({
   user,
@@ -24,20 +35,45 @@ const Auth = ({
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasAccess, setHasAccess] = useState<boolean>(true);
+  const [deniedUserInfo, setDeniedUserInfo] = useState<{
+    displayName: string;
+    email: string;
+  } | null>(null);
   const auth: FirebaseAuth = getAuth(app);
+  const db = getFirestore(app);
   const googleProvider = new GoogleAuthProvider();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user: User | null) => {
       if (user) {
         setUser(user);
+        checkFirestoreAccess(user);
       } else {
         setUser(null);
+        setHasAccess(true);
+        setDeniedUserInfo(null);
       }
     });
 
     return () => unsubscribe();
   }, [auth]);
+
+  const checkFirestoreAccess = async (user: User) => {
+    try {
+      const testDocRef = doc(db, "test-collection", "test-doc");
+      await getDoc(testDocRef);
+      setHasAccess(true);
+    } catch (err) {
+      console.error("Firestore access denied:", err);
+      setHasAccess(false);
+      setDeniedUserInfo({
+        displayName: user.displayName || "לא זמין",
+        email: user.email || "לא זמין",
+      });
+      setUser(null);
+    }
+  };
 
   const handleGoogleSignIn = async (): Promise<void> => {
     try {
@@ -113,6 +149,33 @@ const Auth = ({
         >
           {isLoading ? "מתחבר..." : "הכנס עם חשבון גוגל"}
         </Button>
+      )}
+
+      {!hasAccess && deniedUserInfo && (
+        <Notification
+          title="חוסר הרשאות"
+          icon={<IconAlertCircle size="1.1rem" />}
+          color="orange"
+          withCloseButton={false}
+          mt="md"
+        >
+          אין לך הרשאות למערכת.
+          <br />
+          אנא בקש הרשאה מ
+          <Text fw={700} component="span">
+            צביקה
+          </Text>
+          <br />
+          עבור המשתמש{" "}
+          <Text fw={700} component="span">
+            {deniedUserInfo.displayName}
+          </Text>
+          <br />
+          עם המייל:{" "}
+          <Text fw={700} component="span">
+            {deniedUserInfo.email}
+          </Text>
+        </Notification>
       )}
 
       {error && (

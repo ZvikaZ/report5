@@ -234,7 +234,10 @@ const Screen = ({
 
       <Card shadow="sm" padding="lg" style={{ marginTop: "20px" }}>
         {questionsData.screens[screenIndex].questions.map((question) => (
-          <div key={question.text} style={{ marginBottom: "20px" }}>
+          <div
+            key={question.text ?? question.type}
+            style={{ marginBottom: "20px" }}
+          >
             {question.type !== "boolean" && (
               <Text size="md" weight={500} style={{ marginBottom: "10px" }}>
                 {question.text}

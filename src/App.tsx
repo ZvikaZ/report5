@@ -1,10 +1,11 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO missing react key in Issues
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev
 // TODO remove the 'undefined' entry from answers in DB
+// TODO when finished filling, and clicking back - return to start of fill
+
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA
 // TODO clean warnings

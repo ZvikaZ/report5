@@ -12,42 +12,6 @@ import {
 } from "firebase/firestore";
 import { questionsData } from "./questions-data.js";
 
-// Custom cell renderer for nested ag-grid tables
-const NestedGridCellRenderer = (props) => {
-  const columnDefs = [
-    { field: "failure", headerName: "תקלה", minWidth: 150, maxWidth: 300 },
-    {
-      field: "fixed",
-      headerName: "תוקן",
-      minWidth: 80,
-      maxWidth: 150,
-      cellRenderer: (params) => (params.value ? "✓" : "✗"),
-    },
-    {
-      field: "creationDate",
-      headerName: "תאריך",
-      minWidth: 150,
-      maxWidth: 300,
-      valueFormatter: (params) =>
-        new Date(params.value.seconds * 1000).toLocaleString("he-IL"),
-    },
-  ];
-
-  const rowData = props.value || [];
-
-  return (
-    <div style={{ width: "100%" }} className="ag-theme-alpine">
-      <AgGridReact
-        rowData={rowData}
-        columnDefs={columnDefs}
-        enableRtl={true}
-        domLayout="autoHeight"
-        onGridReady={(params) => params.api.sizeColumnsToFit()}
-      />
-    </div>
-  );
-};
-
 const tankIds = questionsData.screens
   .find((screen) => screen.screen === "כללי")
   .questions.find((q) => q.text === "צ. הטנק").options;
@@ -81,28 +45,39 @@ export const ShowReport = () => {
         headerName: "תאריך",
         minWidth: 120,
         maxWidth: 300,
-        cellStyle: (params) => {
-          if (!params.value?.seconds)
-            return { whiteSpace: "pre-wrap", lineHeight: "1.2" };
+        cellRenderer: (params) => {
+          if (!params.value?.seconds) return "";
           const date = new Date(params.value.seconds * 1000);
           const today = new Date();
           const diffTime = today - date;
           const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-          if (diffDays === 0) {
-            return { whiteSpace: "pre-wrap", lineHeight: "1.2" };
-          } else {
-            const intensity = Math.min(diffDays, 5);
-            const redValue = 255;
-            const greenBlueValue = Math.max(255 - intensity * 51, 0);
-            const color = `rgb(${redValue}, ${greenBlueValue}, ${greenBlueValue})`;
-            return { whiteSpace: "pre-wrap", lineHeight: "1.2", color };
+          let backgroundColor = "transparent";
+          if (diffDays === 1) {
+            backgroundColor = "#ff9999"; // Softer red for 1 day
+          } else if (diffDays >= 2) {
+            backgroundColor = "#ff6666"; // Deeper but pleasant red for 2+ days
           }
-        },
-        valueFormatter: (params) => {
-          if (!params.value?.seconds) return "";
-          const date = new Date(params.value.seconds * 1000);
-          return `${date.toLocaleDateString("he-IL")}\n${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+
+          return (
+            <div style={{ whiteSpace: "pre-wrap", lineHeight: "1.2" }}>
+              <span
+                style={{
+                  backgroundColor,
+                  padding: "2px 4px",
+                  borderRadius: "2px",
+                }}
+              >
+                {`${date.toLocaleDateString("he-IL")}\n${date
+                  .getHours()
+                  .toString()
+                  .padStart(
+                    2,
+                    "0",
+                  )}:${date.getMinutes().toString().padStart(2, "0")}`}
+              </span>
+            </div>
+          );
         },
         wrapText: true,
         autoHeight: true,
@@ -146,6 +121,11 @@ export const ShowReport = () => {
                     : 300,
               wrapText: true,
               autoHeight: true,
+              cellStyle: {
+                whiteSpace: "pre-wrap",
+                direction: "rtl",
+                lineHeight: "1.2",
+              },
             };
             if (question.type === "boolean") {
               colDef.cellRenderer = (params) => (
@@ -183,23 +163,28 @@ export const ShowReport = () => {
             field: question.text,
             headerName: question.text,
             minWidth:
-              question.type === "issues"
-                ? 300
-                : question.type === "boolean"
-                  ? 80
-                  : question.type === "number"
-                    ? 100
+              question.type === "boolean"
+                ? 80
+                : question.type === "number"
+                  ? 100
+                  : question.type === "issues"
+                    ? 300
                     : 150,
             maxWidth:
-              question.type === "issues"
-                ? 600
-                : question.type === "boolean"
-                  ? 120
-                  : question.type === "number"
-                    ? 150
+              question.type === "boolean"
+                ? 120
+                : question.type === "number"
+                  ? 150
+                  : question.type === "issues"
+                    ? 500
                     : 300,
             wrapText: true,
-            autoHeight: question.type !== "issues",
+            autoHeight: true,
+            cellStyle: {
+              whiteSpace: "pre-wrap",
+              direction: "rtl",
+              lineHeight: "1.2",
+            },
           };
           if (question.type === "boolean") {
             colDef.cellRenderer = (params) => (
@@ -207,10 +192,59 @@ export const ShowReport = () => {
                 {params.value ? "✓" : "✗"}
               </span>
             );
-          } else if (question.type === "issues") {
-            colDef.cellRenderer = "nestedGridCellRenderer";
           }
           columns.push(colDef);
+        });
+      }
+    });
+
+    // Explicitly add issues columns with custom renderer
+    const issuesFields = ["תקלות חימוש", "תקלות קשר"];
+    issuesFields.forEach((field) => {
+      if (!columns.some((col) => col.field === field)) {
+        columns.push({
+          field: field,
+          headerName: field,
+          minWidth: 300,
+          maxWidth: 500,
+          wrapText: true,
+          autoHeight: true,
+          cellStyle: {
+            whiteSpace: "pre-wrap",
+            direction: "rtl",
+            lineHeight: "1.2",
+          },
+          cellRenderer: (params) => {
+            if (!params.value || params.value === "אין תקלות מדווחות") {
+              return params.value;
+            }
+            return (
+              <div
+                style={{
+                  whiteSpace: "pre-wrap",
+                  direction: "rtl",
+                  lineHeight: "1.2",
+                }}
+              >
+                {params.value.split("\n").map((line, index) => (
+                  <div key={index}>
+                    {line
+                      .split(" [")
+                      .map((part, i) =>
+                        i === 0 ? (
+                          part
+                        ) : (
+                          <span style={{ color: "blue", fontStyle: "italic" }}>
+                            {" "}
+                            [{part}
+                          </span>
+                        ),
+                      )}
+                  </div>
+                ))}
+              </div>
+            );
+          },
         });
       }
     });
@@ -236,8 +270,8 @@ export const ShowReport = () => {
           const processedData = { ...data };
 
           processedData["מים"] = [
-            `• מים (ג'ריקנים): ${processedData["מים (ג'ריקנים)"] ?? ""}`,
-            `• מים (שישיות): ${processedData["מים (שישיות)"] ?? ""}`,
+            `• ג'ריקנים: ${processedData["מים (ג'ריקנים)"] ?? ""}`,
+            `• שישיות: ${processedData["מים (שישיות)"] ?? ""}`,
           ].join("\n");
 
           Object.keys(groupedQuestions).forEach((screenName) => {
@@ -246,17 +280,38 @@ export const ShowReport = () => {
               .join("\n");
           });
 
+          // Process issues fields with days in square brackets and space
+          const issuesFields = ["תקלות חימוש", "תקלות קשר"];
+          const today = new Date();
+          issuesFields.forEach((field) => {
+            const issues = processedData[field];
+            if (Array.isArray(issues) && issues.length > 0) {
+              processedData[field] = issues
+                .map((issue) => {
+                  const creationDate = issue.creationDate?.seconds
+                    ? new Date(issue.creationDate.seconds * 1000)
+                    : null;
+                  const daysPassed = creationDate
+                    ? Math.floor(
+                        (today - creationDate) / (1000 * 60 * 60 * 24),
+                      ) + 1
+                    : "לא ידוע";
+                  return `• ${issue.failure || "לא צוין"} [${daysPassed} ימים]`;
+                })
+                .join("\n");
+            } else {
+              processedData[field] = "אין תקלות מדווחות";
+            }
+          });
+
           reports.push({ id: doc.id, ...processedData });
         });
       }
 
       setRowData(reports);
-      if (gridRef.current?.api) {
-        gridRef.current.api.autoSizeAllColumns();
-      }
     };
 
-    fetchData().catch(console.error);
+    fetchData().catch((error) => console.error("Error fetching data:", error));
   }, []);
 
   const onGridReady = (params) => {
@@ -269,14 +324,21 @@ export const ShowReport = () => {
       style={{ height: "90vh", width: "98vw", margin: "1vh auto" }}
       className="ag-theme-alpine"
     >
+      <style>
+        {`
+          .ag-theme-alpine .ag-cell {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+          }
+        `}
+      </style>
       <AgGridReact
         ref={gridRef}
         rowData={rowData}
         columnDefs={columnDefs}
         enableRtl={true}
-        components={{
-          nestedGridCellRenderer: NestedGridCellRenderer,
-        }}
         defaultColDef={{
           resizable: true,
         }}

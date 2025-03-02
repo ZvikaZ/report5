@@ -3,7 +3,6 @@
 
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev
-// TODO when finished filling, and clicking back - return to start of fill
 
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA
@@ -13,6 +12,7 @@
 // TODO upload questions to DB
 // TODO km and hours shouldnt decrease, and Z shouldn't change, unless warning issued
 // TODO remove the 'undefined' entry from answers in DB
+// TODO when finished filling, and clicking back - return to start of fill
 
 import "@mantine/core/styles.css";
 import { Button, Container, MantineProvider, Stack } from "@mantine/core";
@@ -29,7 +29,7 @@ import {
 
 import Auth from "./components/Auth.tsx";
 import { Fill } from "./components/Fill.tsx";
-import { Read } from "./components/Read.tsx";
+import { ShowReport } from "./components/ShowReport.tsx";
 
 const MainMenu = ({ user }: { user: User | null }) => {
   if (!user) return <Navigate to="/" />;
@@ -87,7 +87,7 @@ const AppContent = ({
               path="/read"
               element={
                 <ProtectedRoute user={user}>
-                  <Read onFinish={() => navigate("/")} />
+                  <ShowReport onFinish={() => navigate("/")} />
                 </ProtectedRoute>
               }
             />

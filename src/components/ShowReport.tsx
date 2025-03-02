@@ -15,17 +15,19 @@ import { questionsData } from "./questions-data.js";
 // Custom cell renderer for nested ag-grid tables
 const NestedGridCellRenderer = (props) => {
   const columnDefs = [
-    { field: "failure", headerName: "תקלה", maxWidth: 200 },
+    { field: "failure", headerName: "תקלה", minWidth: 150, maxWidth: 300 },
     {
       field: "fixed",
       headerName: "תוקן",
-      maxWidth: 100,
+      minWidth: 80,
+      maxWidth: 150,
       cellRenderer: (params) => (params.value ? "✓" : "✗"),
     },
     {
       field: "creationDate",
       headerName: "תאריך",
-      maxWidth: 200,
+      minWidth: 150,
+      maxWidth: 300,
       valueFormatter: (params) =>
         new Date(params.value.seconds * 1000).toLocaleString("he-IL"),
     },
@@ -52,14 +54,9 @@ const tankIds = questionsData.screens
 
 export const ShowReport = () => {
   const [rowData, setRowData] = useState([]);
-  const gridRef = useRef(null); // Ref to access grid API
+  const gridRef = useRef(null);
 
-  const groupedScreens = [
-    "תחמושת",
-    "ציוד (כמה יש)",
-    "וידוא צלמים",
-    "וידוא צלמי קשר",
-  ];
+  const groupedScreens = ["תחמושת", "ציוד (כמה יש)"];
   const groupedQuestions = groupedScreens.reduce((acc, screenName) => {
     const screen = questionsData.screens.find((s) => s.screen === screenName);
     if (screen) {
@@ -70,32 +67,36 @@ export const ShowReport = () => {
 
   const columnDefs = (() => {
     const columns = [
-      { field: "tankId", headerName: "צ. הטנק", maxWidth: 150 },
+      { field: "tankId", headerName: "צ. הטנק", minWidth: 80, maxWidth: 150 },
       {
         field: "displayName",
         headerName: "שם המדווח",
-        maxWidth: 200,
+        minWidth: 150,
+        maxWidth: 300,
         wrapText: true,
+        autoHeight: true,
       },
       {
         field: "timestamp",
         headerName: "תאריך",
-        maxWidth: 200,
+        minWidth: 120,
+        maxWidth: 300,
         cellStyle: (params) => {
-          if (!params.value?.seconds) return { whiteSpace: "pre-wrap" };
+          if (!params.value?.seconds)
+            return { whiteSpace: "pre-wrap", lineHeight: "1.2" };
           const date = new Date(params.value.seconds * 1000);
           const today = new Date();
           const diffTime = today - date;
           const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
           if (diffDays === 0) {
-            return { whiteSpace: "pre-wrap" };
+            return { whiteSpace: "pre-wrap", lineHeight: "1.2" };
           } else {
             const intensity = Math.min(diffDays, 5);
             const redValue = 255;
             const greenBlueValue = Math.max(255 - intensity * 51, 0);
             const color = `rgb(${redValue}, ${greenBlueValue}, ${greenBlueValue})`;
-            return { whiteSpace: "pre-wrap", color };
+            return { whiteSpace: "pre-wrap", lineHeight: "1.2", color };
           }
         },
         valueFormatter: (params) => {
@@ -104,13 +105,20 @@ export const ShowReport = () => {
           return `${date.toLocaleDateString("he-IL")}\n${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
         },
         wrapText: true,
+        autoHeight: true,
       },
       {
         field: "מים",
         headerName: "מים",
-        maxWidth: 200,
-        cellStyle: { whiteSpace: "pre-wrap", direction: "rtl" },
+        minWidth: 150,
+        maxWidth: 300,
+        cellStyle: {
+          whiteSpace: "pre-wrap",
+          direction: "rtl",
+          lineHeight: "1.2",
+        },
         wrapText: true,
+        autoHeight: true,
       },
     ];
 
@@ -124,8 +132,20 @@ export const ShowReport = () => {
             const colDef = {
               field: question.text,
               headerName: question.text,
-              maxWidth: 200,
+              minWidth:
+                question.type === "boolean"
+                  ? 80
+                  : question.type === "number"
+                    ? 100
+                    : 150,
+              maxWidth:
+                question.type === "boolean"
+                  ? 120
+                  : question.type === "number"
+                    ? 150
+                    : 300,
               wrapText: true,
+              autoHeight: true,
             };
             if (question.type === "boolean") {
               colDef.cellRenderer = (params) => (
@@ -141,19 +161,45 @@ export const ShowReport = () => {
         columns.push({
           field: screen.screen,
           headerName: screen.screen,
-          maxWidth: 300,
-          cellStyle: { whiteSpace: "pre-wrap", direction: "rtl" },
+          minWidth: 250,
+          maxWidth: 500,
+          cellStyle: {
+            whiteSpace: "pre-wrap",
+            direction: "rtl",
+            lineHeight: "1.2",
+          },
           wrapText: true,
+          autoHeight: true,
         });
-      } else if (screen.screen !== "שצל") {
+      } else if (
+        screen.screen !== "שצל" &&
+        screen.screen !== "וידוא צלמים" &&
+        screen.screen !== "וידוא צלמי קשר"
+      ) {
         screen.questions.forEach((question) => {
           if (question.text === "צ. הטנק") return;
 
           const colDef = {
             field: question.text,
             headerName: question.text,
-            maxWidth: question.type === "issues" ? 400 : 200,
+            minWidth:
+              question.type === "issues"
+                ? 300
+                : question.type === "boolean"
+                  ? 80
+                  : question.type === "number"
+                    ? 100
+                    : 150,
+            maxWidth:
+              question.type === "issues"
+                ? 600
+                : question.type === "boolean"
+                  ? 120
+                  : question.type === "number"
+                    ? 150
+                    : 300,
             wrapText: true,
+            autoHeight: question.type !== "issues",
           };
           if (question.type === "boolean") {
             colDef.cellRenderer = (params) => (
@@ -205,7 +251,6 @@ export const ShowReport = () => {
       }
 
       setRowData(reports);
-      // Auto-size columns after data is loaded
       if (gridRef.current?.api) {
         gridRef.current.api.autoSizeAllColumns();
       }
@@ -216,11 +261,14 @@ export const ShowReport = () => {
 
   const onGridReady = (params) => {
     gridRef.current = params;
-    params.api.autoSizeAllColumns(); // Initial sizing
+    params.api.autoSizeAllColumns();
   };
 
   return (
-    <div style={{ height: "600px", width: "100%" }} className="ag-theme-alpine">
+    <div
+      style={{ height: "90vh", width: "98vw", margin: "1vh auto" }}
+      className="ag-theme-alpine"
+    >
       <AgGridReact
         ref={gridRef}
         rowData={rowData}
@@ -229,9 +277,8 @@ export const ShowReport = () => {
         components={{
           nestedGridCellRenderer: NestedGridCellRenderer,
         }}
-        autoHeight={true} // Rows expand to fit content
         defaultColDef={{
-          resizable: true, // Optional: allows manual resizing
+          resizable: true,
         }}
       />
     </div>

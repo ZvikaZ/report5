@@ -1,6 +1,13 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
+// TODO return from Report to Main
+// TODO show days in report, w/ color
+// TODO auto report mails
+// TODO report - if below standrard, color red ; also add deficit report
+// TODO report - add columns for Mizrahi, such as סיווג and סטטוס חוליה
+// TODO report - wasted space on the right
+
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev
 

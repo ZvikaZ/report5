@@ -71,7 +71,7 @@ ${
 ח"ח:
 חוליות – ${answers["חוליות"]}/5
 פינים – ${answers["פינים"]}/10
-טבעות – ${answers["טבעות"]}/0
+טבעות – ${answers["טבעות"]}/20
 
 פערי זיווד: ${answers["פערי זיווד"] || "-"}
 חוסרים נוספים: ${answers["חוסרים נוספים"] || "-"}
@@ -115,7 +115,7 @@ function ReportPopup({ answers, onFinishClick, showButton }) {
 
   const reportContent = generateReport(answers);
 
-  const handleCopy = () => {
+  const handleCopyAndClose = () => {
     navigator.clipboard
       .writeText(reportContent)
       .then(() => {
@@ -124,6 +124,8 @@ function ReportPopup({ answers, onFinishClick, showButton }) {
           message: "הטקסט הועתק ללוח",
           color: "green",
         });
+        onFinishClick();
+        close();
       })
       .catch(() => {
         notifications.show({
@@ -152,8 +154,8 @@ function ReportPopup({ answers, onFinishClick, showButton }) {
           },
         }}
       >
-        <Button onClick={handleCopy} variant="outline">
-          העתק ללוח
+        <Button onClick={handleCopyAndClose} variant="outline">
+          העתק וסגור
         </Button>
         <Text
           style={{
@@ -166,8 +168,8 @@ function ReportPopup({ answers, onFinishClick, showButton }) {
         >
           {reportContent}
         </Text>
-        <Button onClick={handleCopy} variant="outline">
-          העתק ללוח
+        <Button onClick={handleCopyAndClose} variant="outline">
+          העתק וסגור
         </Button>
       </Modal>
     </>

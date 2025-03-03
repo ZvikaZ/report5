@@ -91,6 +91,23 @@ const ShowReport = () => {
       field: "userDisplayName",
       headerName: "מגיש הדוח",
     },
+    { field: "שילוט" },
+    { field: 'שע"מ', filter: "agNumberColumnFilter" },
+    { field: 'ק"מ', filter: "agNumberColumnFilter" },
+    {
+      field: "סולר",
+      filter: "agNumberColumnFilter",
+      cellStyle: (params) => {
+        if (params.value == null) return {};
+        const value = Math.max(0, Math.min(1400, params.value)); // Clamp between 0 and 1400
+        const intensity = 1 - value / 1400; // 0 (at 1400) to 1 (at 0)
+        return {
+          backgroundColor: `rgba(255, 0, 0, ${intensity})`,
+          display: "inline-block",
+          padding: "0 4px",
+        };
+      },
+    },
   ]);
 
   const tankIds = questionsData.screens

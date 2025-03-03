@@ -6,7 +6,7 @@ Object.assign(LicenseManager.prototype, {
 
 import { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { subDays, isBefore } from "date-fns";
+import { subDays, isBefore, differenceInDays } from "date-fns";
 import {
   collection,
   getDocs,
@@ -53,6 +53,46 @@ const myTheme = themeQuartz.withParams({
   spacing: 8,
 });
 
+// Function for gradual red: lower value = more red, higher value = less red
+const getGradualRedStyle = (value, min, max) => {
+  if (value == null) return {};
+  const clampedValue = Math.max(min, Math.min(max, value));
+  const intensity = 1 - (clampedValue - min) / (max - min); // 1 at min (red), 0 at max (white)
+  return {
+    backgroundColor: `rgba(255, 0, 0, ${intensity})`,
+    display: "inline-block",
+    padding: "0 4px",
+  };
+};
+
+const redColorRanges = {
+  timestamp: {
+    min: 0,
+    max: 2,
+    getValue: (params) =>
+      2 - differenceInDays(new Date(), params.value?.toDate()), // Invert: today = 2 (white), 2 days ago = 0 (red)
+  },
+  סולר: {
+    min: 0,
+    max: 1400,
+    getValue: (params) => params.value,
+  },
+  מים: {
+    min: 0,
+    max: 2 * 20 + 2 * 1.5, // 43 liters
+    getValue: (params) => {
+      const jerrycans = params.data?.["מים (ג'ריקנים)"] || 0;
+      const sixPacks = params.data?.["מים (שישיות)"] || 0;
+      return jerrycans * 20 + sixPacks * 1.5;
+    },
+  },
+  'מנ"קים': {
+    min: 0,
+    max: 2,
+    getValue: (params) => params.value,
+  },
+};
+
 const ShowReport = () => {
   const [rowData, setRowData] = useState([]);
 
@@ -61,6 +101,15 @@ const ShowReport = () => {
     autoHeight: true,
     sortable: true,
     filter: true,
+    cellStyle: (params) => {
+      const field = params.colDef.field;
+      if (redColorRanges[field]) {
+        const { min, max, getValue } = redColorRanges[field];
+        const value = getValue(params);
+        return { ...getGradualRedStyle(value, min, max), whiteSpace: "pre" };
+      }
+      return { whiteSpace: "pre" };
+    },
   };
 
   const [columnDefs] = useState([
@@ -77,15 +126,6 @@ const ShowReport = () => {
           timeStyle: "short",
         });
       },
-      // Apply lighter red background to dates from yesterday or earlier
-      cellStyle: (params) =>
-        params.value && isBefore(params.value.toDate(), subDays(new Date(), 1))
-          ? {
-              backgroundColor: "#ff9999",
-              display: "inline-block",
-              padding: "0 4px",
-            }
-          : {},
     },
     {
       field: "userDisplayName",
@@ -94,20 +134,19 @@ const ShowReport = () => {
     { field: "שילוט" },
     { field: 'שע"מ', filter: "agNumberColumnFilter" },
     { field: 'ק"מ', filter: "agNumberColumnFilter" },
+    { field: "סולר", filter: "agNumberColumnFilter" },
     {
-      field: "סולר",
+      field: "מים",
+      headerName: "מים",
       filter: "agNumberColumnFilter",
-      cellStyle: (params) => {
-        if (params.value == null) return {};
-        const value = Math.max(0, Math.min(1400, params.value)); // Clamp between 0 and 1400
-        const intensity = 1 - value / 1400; // 0 (at 1400) to 1 (at 0)
-        return {
-          backgroundColor: `rgba(255, 0, 0, ${intensity})`,
-          display: "inline-block",
-          padding: "0 4px",
-        };
+      valueGetter: (params) => {
+        const jerrycans = params.data?.["מים (ג'ריקנים)"] || 0;
+        const sixPacks = params.data?.["מים (שישיות)"] || 0;
+        return `ג'ריקנים: ${jerrycans}\nשישיות: ${sixPacks}`;
       },
+      // No need for cellStyle here since defaultColDef handles it
     },
+    { field: 'מנ"קים', filter: "agNumberColumnFilter" },
   ]);
 
   const tankIds = questionsData.screens

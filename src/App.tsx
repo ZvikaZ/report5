@@ -27,7 +27,7 @@
 // TODO when finished filling, and clicking back - return to start of fill
 
 import "@mantine/core/styles.css";
-import { Button, Container, MantineProvider, Stack } from "@mantine/core";
+import { Button, Container, MantineProvider, Stack, Box } from "@mantine/core";
 import { useState } from "react";
 import { User } from "firebase/auth";
 import {
@@ -82,16 +82,27 @@ const AppContent = ({
 
   return (
     <MantineProvider>
-      <Container size="sm" px="sm" pt="md">
+      <Container size="xl" px="sm" pt="md">
         <Stack>
-          <Auth user={user} setUser={setUser} />
+          <Box maw={768}>
+            <Auth user={user} setUser={setUser} />
+          </Box>
           <Routes>
-            <Route path="/" element={<MainMenu user={user} />} />
+            <Route
+              path="/"
+              element={
+                <Box maw={768}>
+                  <MainMenu user={user} />
+                </Box>
+              }
+            />
             <Route
               path="/fill/*"
               element={
                 <ProtectedRoute user={user}>
-                  <Fill user={user!} onFinish={() => navigate("/")} />
+                  <Box maw={768}>
+                    <Fill user={user!} onFinish={() => navigate("/")} />
+                  </Box>
                 </ProtectedRoute>
               }
             />
@@ -106,12 +117,14 @@ const AppContent = ({
             <Route
               path="*"
               element={
-                <Stack align="center" py="xl">
-                  <div>404 - דף לא נמצא</div>
-                  <Button component={Link} to="/">
-                    חזור לדף הראשי
-                  </Button>
-                </Stack>
+                <Box maw={768}>
+                  <Stack align="center" py="xl">
+                    <div>404 - דף לא נמצא</div>
+                    <Button component={Link} to="/">
+                      חזור לדף הראשי
+                    </Button>
+                  </Stack>
+                </Box>
               }
             />
           </Routes>

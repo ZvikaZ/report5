@@ -146,7 +146,9 @@ const Screen = ({
             hideControls={question.fixed}
             allowNegative={false}
             min={0}
+            max={question.max}
             onChange={(val) => handleAnswerChange(key, val)}
+            step={question.step}
             onFocus={(e) => {
               if (e.target.value === "0") {
                 e.target.value = "";

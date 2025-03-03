@@ -12,7 +12,7 @@ export const questionsData = {
         { type: "text", text: "שילוט", description: "איך הטנק משולט בפועל" },
         { type: "number", text: 'שע"מ' },
         { type: "number", text: 'ק"מ' },
-        { type: "number", text: "סולר" },
+        { type: "number", text: "סולר", step: 100, max: 1400 },
       ],
     },
     {

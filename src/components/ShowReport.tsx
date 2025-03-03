@@ -6,6 +6,7 @@ Object.assign(LicenseManager.prototype, {
 
 import { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
+import { subDays, isBefore } from "date-fns";
 import {
   collection,
   getDocs,
@@ -74,6 +75,15 @@ const ShowReport = () => {
           timeStyle: "short",
         });
       },
+      // Apply lighter red background to dates from yesterday or earlier
+      cellStyle: (params) =>
+        params.value && isBefore(params.value.toDate(), subDays(new Date(), 1))
+          ? {
+              backgroundColor: "#ef6363",
+              display: "inline-block",
+              padding: "0 4px",
+            }
+          : {},
     },
   ]);
 

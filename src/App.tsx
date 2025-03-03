@@ -12,6 +12,7 @@
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
 // TODO report - cell selection
 
+// TODO use Tabler icons instead of '✓', '✗'
 // TODO add תאום כוונות and טפש/ח (when and who)
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev

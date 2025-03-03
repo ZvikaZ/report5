@@ -50,7 +50,7 @@ ModuleRegistry.registerModules([
 ]);
 
 const myTheme = themeQuartz.withParams({
-  spacing: 8,
+  spacing: 4,
 });
 
 // Function for gradual red: lower value = more red, higher value = less red
@@ -124,6 +124,15 @@ const redColorRanges = {
     getValue: (params) =>
       params.data?.["ערכת עזרה ראשונה"] + params.data?.['פק"ל היגיינה'],
   },
+  "כשירות וקישוריות": {
+    min: 0,
+    max: 2,
+    getValue: (params) => {
+      const gps = params.data?.["כשירות (GPS)"] ? 1 : 0;
+      const wifi = params.data?.["קישוריות (WIFI)"] ? 1 : 0;
+      return gps + wifi;
+    },
+  },
 };
 
 const ShowReport = () => {
@@ -143,6 +152,51 @@ const ShowReport = () => {
       }
       return { whiteSpace: "pre" };
     },
+  };
+
+  const issueCellRenderer = (params) => {
+    if (!params.value || params.value.length === 0) {
+      return "";
+    }
+
+    const today = new Date();
+
+    return params.value.map((issue) => {
+      // Get creation date
+      const creationDate =
+        typeof issue.creationDate.toDate === "function"
+          ? issue.creationDate.toDate()
+          : new Date(issue.creationDate.seconds * 1000);
+
+      const daysSince = differenceInDays(today, creationDate) + 1;
+
+      // TODO use getGradualRedStyle instead
+      // Calculate intensity: 0 (white) at 1 day, 1 (red) at tooMuchDays, stays at 1 beyond tooMuchDays
+      const tooMuchDays = 28;
+      const intensity = Math.min(1, (daysSince - 1) / (tooMuchDays - 1));
+
+      // Apply gradual red background
+      const style = {
+        backgroundColor: `rgba(255, 0, 0, ${intensity})`,
+        display: "block",
+        padding: "2px 4px",
+        margin: "1px 0",
+      };
+
+      return (
+        <div key={issue.failure} style={style}>
+          {issue.failure}{" "}
+          <span
+            style={{
+              fontStyle: "italic",
+              fontSize: "0.95em",
+            }}
+          >
+            [{daysSince} ימים]
+          </span>
+        </div>
+      );
+    });
   };
 
   const [columnDefs] = useState([
@@ -209,6 +263,28 @@ const ShowReport = () => {
       valueGetter: (params) =>
         `ערכת עזרה ראשונה: ${params.data?.["ערכת עזרה ראשונה"] ? "✓" : "✗"}\nפק"ל היגיינה: ${params.data?.['פק"ל היגיינה'] ? "✓" : "✗"}`,
     },
+    { field: "פערי זיווד" },
+    { field: "חוסרים נוספים" },
+
+    {
+      field: "תקלות חימוש",
+      cellRenderer: issueCellRenderer,
+    },
+    {
+      field: "כשירות וקישוריות",
+      valueGetter: (params) => {
+        const gps = params.data?.["כשירות (GPS)"] ? "✓" : "✗";
+        const wifi = params.data?.["קישוריות (WIFI)"] ? "✓" : "✗";
+        return `כשירות (GPS): ${gps}\nקישוריות (WIFI): ${wifi}`;
+      },
+    },
+    {
+      field: "תקלות קשר",
+      cellRenderer: issueCellRenderer,
+    },
+
+    // keep this last
+    { field: "הערות" },
   ]);
 
   const tankIds = questionsData.screens

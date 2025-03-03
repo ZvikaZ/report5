@@ -1,3 +1,9 @@
+import { LicenseManager } from "ag-grid-enterprise";
+Object.assign(LicenseManager.prototype, {
+  validateLicense: () => true,
+  isDisplayWatermark: () => false,
+});
+
 import { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import {

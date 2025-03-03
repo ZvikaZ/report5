@@ -8,6 +8,7 @@
 // TODO report - add columns for Mizrahi, such as סיווג and סטטוס חוליה
 // TODO report - wasted space on the right
 
+// TODO add תאום כוונות and טפש/ח (when and who)
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev
 

@@ -91,6 +91,39 @@ const redColorRanges = {
     max: 2,
     getValue: (params) => params.value,
   },
+  סוללות: {
+    min: 0,
+    max: 4, // 1 (AA) + 1 (AAA) + 2 (פטמה)
+    getValue: (params) => {
+      const aa = params.data?.["סוללות AA"] || 0;
+      const aaa = params.data?.["סוללות AAA"] || 0;
+      const pitma = params.data?.["סוללות פטמה"] || 0;
+      return aa + aaa + pitma; // Total count for coloring
+    },
+  },
+  שמנים: {
+    min: 0,
+    max: 6, // 2 (2510) + 2 (2640) + 1 (9040) + 1 (9105)
+    getValue: (params) => {
+      const oil2510 = params.data?.["שמן 2510"] || 0;
+      const oil2640 = params.data?.["שמן 2640"] || 0;
+      const oil9040 = params.data?.["שמן 9040"] || 0;
+      const oil9105 = params.data?.["שמן 9105"] || 0;
+      return oil2510 + oil2640 + oil9040 + oil9105; // Total count for coloring
+    },
+  },
+  חח: {
+    min: 0,
+    max: 5 + 10 + 20,
+    getValue: (params) =>
+      params.data?.["חוליות"] + params.data?.["פינים"] + params.data?.["טבעות"],
+  },
+  פקלים: {
+    min: 0,
+    max: 2,
+    getValue: (params) =>
+      params.data?.["ערכת עזרה ראשונה"] + params.data?.['פק"ל היגיינה'],
+  },
 };
 
 const ShowReport = () => {
@@ -137,7 +170,6 @@ const ShowReport = () => {
     { field: "סולר", filter: "agNumberColumnFilter" },
     {
       field: "מים",
-      headerName: "מים",
       filter: "agNumberColumnFilter",
       valueGetter: (params) => {
         const jerrycans = params.data?.["מים (ג'ריקנים)"] || 0;
@@ -147,6 +179,36 @@ const ShowReport = () => {
       // No need for cellStyle here since defaultColDef handles it
     },
     { field: 'מנ"קים', filter: "agNumberColumnFilter" },
+    {
+      field: "סוללות",
+      valueGetter: (params) => {
+        const aa = params.data?.["סוללות AA"] || 0;
+        const aaa = params.data?.["סוללות AAA"] || 0;
+        const pitma = params.data?.["סוללות פטמה"] || 0;
+        return `אצבע: ${aa}\nטריפל איי: ${aaa}\nפטמה: ${pitma}`; //TODO write AA and AAA, and have normal RTL text
+      },
+    },
+    {
+      field: "שמנים",
+      valueGetter: (params) => {
+        const oil2510 = params.data?.["שמן 2510"] || 0;
+        const oil2640 = params.data?.["שמן 2640"] || 0;
+        const oil9040 = params.data?.["שמן 9040"] || 0;
+        const oil9105 = params.data?.["שמן 9105"] || 0;
+        return `2510: ${oil2510}\n2640: ${oil2640}\n9040: ${oil9040}\n9105: ${oil9105}`;
+      },
+    },
+    {
+      field: "חח",
+      valueGetter: (params) =>
+        `חוליות: ${params.data?.["חוליות"] || 0}\nפינים: ${params.data?.["פינים"] || 0}\nטבעות: ${params.data?.["טבעות"] || 0}`,
+    },
+
+    {
+      field: "פקלים",
+      valueGetter: (params) =>
+        `ערכת עזרה ראשונה: ${params.data?.["ערכת עזרה ראשונה"] ? "✓" : "✗"}\nפק"ל היגיינה: ${params.data?.['פק"ל היגיינה'] ? "✓" : "✗"}`,
+    },
   ]);
 
   const tankIds = questionsData.screens

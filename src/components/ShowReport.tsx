@@ -200,7 +200,7 @@ const ShowReport = () => {
   };
 
   const [columnDefs] = useState([
-    { field: "tankId", headerName: "טנק" },
+    { field: "tankId", headerName: "טנק", pinned: "right" },
     {
       field: "timestamp",
       headerName: "תאריך",
@@ -346,6 +346,7 @@ const ShowReport = () => {
         enableRtl={true}
         theme={myTheme}
         onFirstDataRendered={onFirstDataRendered}
+        cellSelection={true}
       />
     </div>
   );

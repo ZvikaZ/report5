@@ -2,15 +2,11 @@
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
 // TODO return from Report to Main
-// TODO show days in report, w/ color
 // TODO auto report mails
-// TODO report - if below standrard, color red ; also add deficit report
+// TODO report - add deficit report
 // TODO report - add columns for Mizrahi, such as סיווג and סטטוס חוליה
-// TODO report - wasted space on the right
 // TODO report - maybe use context menu for intersting things
-// TODO report - "freeze" first columns, like in excel
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
-// TODO report - cell selection
 
 // TODO use Tabler icons instead of '✓', '✗'
 // TODO add תאום כוונות and טפש/ח (when and who)

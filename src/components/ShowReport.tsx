@@ -14,6 +14,8 @@ import {
   orderBy,
   query,
   where,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig.ts";
 import { questionsData } from "./questions-data.js";
@@ -79,11 +81,15 @@ const ShowReport = () => {
       cellStyle: (params) =>
         params.value && isBefore(params.value.toDate(), subDays(new Date(), 1))
           ? {
-              backgroundColor: "#ef6363",
+              backgroundColor: "#ff9999",
               display: "inline-block",
               padding: "0 4px",
             }
           : {},
+    },
+    {
+      field: "userDisplayName",
+      headerName: "מגיש הדוח",
     },
   ]);
 
@@ -91,7 +97,7 @@ const ShowReport = () => {
     .find((screen) => screen.screen === "כללי")
     .questions.find((q) => q.text === "צ. הטנק").options;
 
-  // Fetch latest status for each tankId
+  // Fetch latest status for each tankId and user display names
   useEffect(() => {
     const fetchData = async () => {
       const promises = tankIds.map(async (tankId) => {
@@ -102,9 +108,23 @@ const ShowReport = () => {
           limit(1),
         );
         const snapshot = await getDocs(q);
-        return snapshot.docs.length > 0
-          ? { tankId, ...snapshot.docs[0].data() }
-          : { tankId, timestamp: null };
+        if (snapshot.docs.length === 0) {
+          return { tankId, timestamp: null };
+        }
+
+        const tankData = snapshot.docs[0].data();
+        let userDisplayName = tankData.user;
+
+        // Fetch display name from allowedEmails using document ID
+        if (tankData.user) {
+          const userDocRef = doc(db, "allowedEmails", tankData.user);
+          const userDoc = await getDoc(userDocRef);
+          userDisplayName = userDoc.exists()
+            ? userDoc.data().displayedName
+            : tankData.user;
+        }
+
+        return { tankId, ...tankData, userDisplayName };
       });
 
       const results = await Promise.all(promises);

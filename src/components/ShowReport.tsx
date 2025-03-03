@@ -25,11 +25,13 @@ import {
   ContextMenuModule,
   ExcelExportModule,
   IntegratedChartsModule,
+  SetFilterModule,
 } from "ag-grid-enterprise";
 import {
   ClientSideRowModelModule,
   ModuleRegistry,
   ValidationModule,
+  themeQuartz,
 } from "ag-grid-community";
 
 ModuleRegistry.registerModules([
@@ -40,16 +42,30 @@ ModuleRegistry.registerModules([
   ContextMenuModule,
   CellSelectionModule,
   IntegratedChartsModule.with(AgChartsEnterpriseModule),
+  SetFilterModule,
   ValidationModule /* Development Only */,
 ]);
 
+const myTheme = themeQuartz.withParams({
+  spacing: 8,
+});
+
 const ShowReport = () => {
   const [rowData, setRowData] = useState([]);
+
+  const defaultColDef = {
+    wrapText: true,
+    autoHeight: true,
+    sortable: true,
+    filter: true,
+  };
+
   const [columnDefs] = useState([
-    { field: "tankId", headerName: "צ. טנק" },
+    { field: "tankId", headerName: "טנק" },
     {
       field: "timestamp",
       headerName: "תאריך",
+      filter: "agDateColumnFilter",
       valueFormatter: (params) => {
         if (!params.value) return "N/A";
         const date = params.value.toDate();
@@ -60,12 +76,6 @@ const ShowReport = () => {
       },
     },
   ]);
-
-  const defaultColDef = {
-    wrapText: true,
-    autoHeight: true,
-    sortable: true,
-  };
 
   const tankIds = questionsData.screens
     .find((screen) => screen.screen === "כללי")
@@ -98,6 +108,10 @@ const ShowReport = () => {
     fetchData();
   }, [tankIds]);
 
+  const onFirstDataRendered = (params) => {
+    params.api.autoSizeAllColumns();
+  };
+
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       <AgGridReact
@@ -106,6 +120,8 @@ const ShowReport = () => {
         defaultColDef={defaultColDef}
         localeText={AG_GRID_LOCALE_IL}
         enableRtl={true}
+        theme={myTheme}
+        onFirstDataRendered={onFirstDataRendered}
       />
     </div>
   );

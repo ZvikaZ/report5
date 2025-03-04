@@ -1,16 +1,16 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO return from Report to Main
-// TODO auto report mails
-
-// TODO report - add deficit report
+// TODO report - fix issues filtering
 // TODO report - missing צלמים
-// TODO report - add columns for Mizrahi, such as סיווג and סטטוס חוליה
-// TODO report - maybe use context menu for intersting things
+// TODO report - add deficit report
+// TODO report - Date is checking 24hrs instead of day
+// TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
+// TODO route - protected? 404 for /read
 // TODO report - dont red color all the cell
-// TODO route - protected? 404 in mobile for /read
+// TODO Export to excel, some columns need special treatment
+// TODO report - maybe use context menu for interesting things (also, add missing default actions)
 
 // TODO add תאום כוונות and טפש/ח (when and who)
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
@@ -21,11 +21,16 @@
 // TODO clean warnings
 // TODO replace favicon
 
+// TODO auto report mails
+// TODO return from Report to Main
+
 // TODO upload questions to DB
 // TODO report - make it more generic
 // TODO km and hours shouldnt decrease, and Z shouldn't change, unless warning issued
 // TODO remove the 'undefined' entry from answers in DB
 // TODO when finished filling, and clicking back - return to start of fill
+
+// TODO report - fix Set filter
 
 import "@mantine/core/styles.css";
 import { Button, Container, MantineProvider, Stack, Box } from "@mantine/core";

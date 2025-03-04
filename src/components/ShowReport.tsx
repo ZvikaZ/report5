@@ -236,7 +236,6 @@ const ShowReport = () => {
     { field: "סולר", filter: "agNumberColumnFilter" },
     {
       field: "מים",
-      filter: "agNumberColumnFilter",
       valueGetter: (params) => {
         const jerrycans = params.data?.["מים (ג'ריקנים)"] || 0;
         const sixPacks = params.data?.["מים (שישיות)"] || 0;
@@ -370,6 +369,7 @@ const ShowReport = () => {
         theme={myTheme}
         onFirstDataRendered={onFirstDataRendered}
         cellSelection={true}
+        suppressSetFilterByDefault={true} //TODO remove this, and fix set filter
       />
     </div>
   );

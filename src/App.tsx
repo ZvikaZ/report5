@@ -1,15 +1,13 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO report - fix issues filtering
-// TODO report - missing צלמים
+// TODO report - missing צלמים and שצל
 // TODO report - add deficit report
 // TODO report - Date is checking 24hrs instead of day
 // TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
 // TODO route - protected? 404 for /read
 // TODO report - dont red color all the cell
-// TODO Export to excel, some columns need special treatment
 // TODO report - maybe use context menu for interesting things (also, add missing default actions)
 
 // TODO add תאום כוונות and טפש/ח (when and who)

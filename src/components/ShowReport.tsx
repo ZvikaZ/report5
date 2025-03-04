@@ -291,6 +291,8 @@ const ShowReport = () => {
     {
       field: "תקלות חימוש",
       cellRenderer: issueCellRenderer,
+      valueFormatter: (params) =>
+        params.value.map((issue) => issue.failure).join("\n"),
     },
     {
       field: "כשירות וקישוריות",
@@ -303,6 +305,8 @@ const ShowReport = () => {
     {
       field: "תקלות קשר",
       cellRenderer: issueCellRenderer,
+      valueFormatter: (params) =>
+        params.value.map((issue) => issue.failure).join("\n"),
     },
 
     // keep this last

@@ -3,12 +3,15 @@
 
 // TODO return from Report to Main
 // TODO auto report mails
+
 // TODO report - add deficit report
+// TODO report - missing צלמים
 // TODO report - add columns for Mizrahi, such as סיווג and סטטוס חוליה
 // TODO report - maybe use context menu for intersting things
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
+// TODO report - dont red color all the cell
+// TODO route - protected? 404 in mobile for /read
 
-// TODO use Tabler icons instead of '✓', '✗'
 // TODO add תאום כוונות and טפש/ח (when and who)
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev
@@ -19,6 +22,7 @@
 // TODO replace favicon
 
 // TODO upload questions to DB
+// TODO report - make it more generic
 // TODO km and hours shouldnt decrease, and Z shouldn't change, unless warning issued
 // TODO remove the 'undefined' entry from answers in DB
 // TODO when finished filling, and clicking back - return to start of fill

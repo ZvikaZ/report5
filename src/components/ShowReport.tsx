@@ -124,6 +124,18 @@ const redColorRanges = {
     getValue: (params) =>
       params.data?.["ערכת עזרה ראשונה"] + params.data?.['פק"ל היגיינה'],
   },
+  תחמושת: {
+    min: 0,
+    // we color only according to few ammo items //TODO make that also generic
+    max: 39 + 100,
+    getValue: (params) =>
+      // params.data["חלול 1 (ישראלי)"] +
+      // params.data["חלול 3 (אמריקאי)"] +
+      // params.data["חצב"] +
+      Math.min(39, params.data["ברוס מאג 7.62"]) +
+      Math.min(100, params.data["כדורי 0.5"]),
+    // params.data["רימוני רסס"],
+  },
   "כשירות וקישוריות": {
     min: 0,
     max: 2,
@@ -265,7 +277,18 @@ const ShowReport = () => {
     },
     { field: "פערי זיווד" },
     { field: "חוסרים נוספים" },
-
+    {
+      field: "תחמושת",
+      valueGetter: (params) =>
+        [
+          `חלול 1\t:\t${params.data["חלול 1 (ישראלי)"]}`,
+          `חלול 3\t:\t${params.data["חלול 3 (אמריקאי)"]}`,
+          `חצב\t\t:\t${params.data["חצב"]}`, // Extra tab for חצב
+          `מאג 7.62\t:\t${params.data["ברוס מאג 7.62"]}`,
+          `כדורי 0.5\t:\t${params.data["כדורי 0.5"]}`,
+          `רימוני רסס :\t${params.data["רימוני רסס"]}`, // One less tab for רימוני רסס
+        ].join("\n"),
+    },
     {
       field: "תקלות חימוש",
       cellRenderer: issueCellRenderer,

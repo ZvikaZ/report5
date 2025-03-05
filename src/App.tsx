@@ -1,11 +1,11 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
+// TODO report - enlarge screen space
 // TODO report - missing צלמים and שצל
 // TODO report - add deficit report
 // TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
-// TODO route - protected? 404 for /read
 // TODO report - dont red color all the cell
 // TODO report - maybe use context menu for interesting things (also, add missing default actions)
 

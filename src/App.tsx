@@ -3,7 +3,6 @@
 
 // TODO report - missing צלמים and שצל
 // TODO report - add deficit report
-// TODO report - Date is checking 24hrs instead of day
 // TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
 // TODO route - protected? 404 for /read

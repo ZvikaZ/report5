@@ -6,7 +6,7 @@ Object.assign(LicenseManager.prototype, {
 
 import { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { subDays, isBefore, differenceInDays } from "date-fns";
+import { differenceInCalendarDays } from "date-fns";
 import {
   collection,
   getDocs,
@@ -70,7 +70,7 @@ const redColorRanges = {
     min: 0,
     max: 2,
     getValue: (params) =>
-      2 - differenceInDays(new Date(), params.value?.toDate()), // Invert: today = 2 (white), 2 days ago = 0 (red)
+      2 - differenceInCalendarDays(new Date(), params.value?.toDate()), // Invert: today = 2 (white), 2 days ago = 0 (red)
   },
   סולר: {
     min: 0,
@@ -180,7 +180,7 @@ const ShowReport = () => {
           ? issue.creationDate.toDate()
           : new Date(issue.creationDate.seconds * 1000);
 
-      const daysSince = differenceInDays(today, creationDate) + 1;
+      const daysSince = differenceInCalendarDays(today, creationDate) + 1;
 
       // TODO use getGradualRedStyle instead
       // Calculate intensity: 0 (white) at 1 day, 1 (red) at tooMuchDays, stays at 1 beyond tooMuchDays

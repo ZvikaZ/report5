@@ -3,10 +3,11 @@
 
 // TODO report - missing צלמים
 // TODO fill retroactive שצל
-// TODO backup DB
+// TODO שצל - add sums
+// TODO report - add תחמושת , with sum and avg
+// TODO report - add deficit report
 // TODO report - fix batteries coloring (and verify all columns)
 // TODO report - enlarge screen space
-// TODO report - add deficit report
 // TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)
 // TODO report - dont red color all the cell
 
@@ -17,6 +18,7 @@
 // TODO add תאום כוונות and טפש/ח (when and who)
 // TODO reduce size of Issues table when empty (because of phone's keyboard)
 // TODO separate DBs for prod and dev, with indication for dev
+// TODO backup DB automatically
 
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA

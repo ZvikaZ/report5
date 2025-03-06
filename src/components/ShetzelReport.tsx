@@ -25,11 +25,6 @@ function ShetzelReport() {
       );
       const querySnapshot = await getDocs(q);
 
-      console.log(
-        "Firestore result:",
-        querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-      );
-
       const data = [];
       const shetzelFields = new Set();
 
@@ -58,14 +53,19 @@ function ShetzelReport() {
         }
       });
 
-      console.log("Table rows:", data);
+      // Filter columns: only include those with at least one non-zero value
+      const nonZeroFields = Array.from(shetzelFields).filter((field) =>
+        data.some((row) => row[field] !== 0),
+      );
+
       setRowData(data);
       setColumnDefs([
         { headerName: "תאריך", field: "timestamp" },
         { headerName: "טנק", field: "tankId" },
-        ...Array.from(shetzelFields).map((field) => ({
-          headerName: field.replace("שצל: ", ""),
+        ...nonZeroFields.map((field) => ({
+          headerName: field.replace("שצל: ", "").replace("שצל:", ""),
           field,
+          valueGetter: (params) => params.data[field], // required because of fields with dot in the key
         })),
       ]);
     };
@@ -73,13 +73,20 @@ function ShetzelReport() {
     fetchData();
   }, []);
 
+  const onFirstDataRendered = (params) => {
+    // params.api.autoSizeAllColumns();   //TODO doesnt work. why?
+  };
+
   return (
     <div style={{ height: "100vh", width: "100%" }}>
+      <h2>מידע שצל עד 6/3 כרגע חלקי</h2>
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
         localeText={AG_GRID_LOCALE_IL}
         enableRtl={true}
+        cellSelection={true}
+        onFirstDataRendered={onFirstDataRendered}
       />
     </div>
   );

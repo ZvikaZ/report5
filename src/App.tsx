@@ -1,9 +1,11 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
+// TODO report - missing צלמים
+// TODO fill retroactive שצל
+// TODO backup DB
 // TODO report - fix batteries coloring (and verify all columns)
 // TODO report - enlarge screen space
-// TODO report - missing צלמים and שצל
 // TODO report - add deficit report
 // TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)
 // TODO report - dont red color all the cell

@@ -11,6 +11,7 @@ import {
 import { db } from "../firebaseConfig.ts";
 import { questionsData } from "./questions-data.js";
 import { AG_GRID_LOCALE_IL } from "@ag-grid-community/locale";
+import { endOfDay, subDays } from "date-fns";
 
 const IdReport = ({ screenName }) => {
   const [rowData, setRowData] = useState([]);
@@ -26,20 +27,40 @@ const IdReport = ({ screenName }) => {
     const fetchData = async () => {
       const results = [];
 
-      // Fetch latest data for each tank ID
       for (const tankId of tankIds) {
-        const q = query(
+        // Fetch the latest record
+        const latestQuery = query(
           collection(db, "tankStatus"),
           where("tankId", "==", tankId),
           orderBy("timestamp", "desc"),
           limit(1),
         );
-
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          results.push({ tankId, ...data });
+        const latestSnapshot = await getDocs(latestQuery);
+        let latestData = null;
+        latestSnapshot.forEach((doc) => {
+          latestData = { tankId, ...doc.data() };
         });
+
+        // Fetch the previous record (latest from yesterday or before)
+        const previousQuery = query(
+          collection(db, "tankStatus"),
+          where("tankId", "==", tankId),
+          where("timestamp", "<=", endOfDay(subDays(new Date(), 1))),
+          orderBy("timestamp", "desc"),
+          limit(1),
+        );
+        const previousSnapshot = await getDocs(previousQuery);
+        let previousData = null;
+        previousSnapshot.forEach((doc) => {
+          previousData = { tankId, ...doc.data() };
+        });
+
+        if (latestData) {
+          results.push({
+            ...latestData,
+            previous: previousData || {},
+          });
+        }
       }
 
       // Filter questions based on the provided screenName
@@ -56,12 +77,28 @@ const IdReport = ({ screenName }) => {
           // Use valueGetter to handle fields with dots in their names (e.g., "צ. מיקרון").
           // AG-Grid interprets dots as nested paths by default, but our data uses flat keys with dots.
           valueGetter: (params) => params.data[q.text],
-          // Format boolean values as ✓ (true) or ✗ (false)
           cellRenderer: (params) => {
-            if (typeof params.value === "boolean") {
-              return params.value ? "✓" : "✗";
+            const latestValue = params.data[q.text];
+            const previousValue = params.data.previous[q.text];
+
+            const formatValue = (value) =>
+              typeof value === "boolean" ? (value ? "✓" : "✗") : value;
+
+            // Show changes in red if previous exists and value differs
+            if (
+              previousValue !== undefined &&
+              latestValue !== previousValue &&
+              !(latestValue === undefined && previousValue === null)
+            ) {
+              return (
+                <span style={{ color: "red" }}>
+                  ישן: {formatValue(previousValue)}
+                  <br />
+                  חדש: {formatValue(latestValue)}
+                </span>
+              );
             }
-            return params.value;
+            return formatValue(latestValue);
           },
         })),
       ];
@@ -71,7 +108,7 @@ const IdReport = ({ screenName }) => {
     };
 
     fetchData();
-  }, [screenName]);
+  }, [screenName, tankIds]);
 
   return (
     <div style={{ height: "100vh", width: "100%" }}>

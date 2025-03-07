@@ -1,7 +1,7 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO report - צלמים : compare to previous report, show by date
+// TODO report - צלמים : verify comparing to previous report
 // TODO report - add תחמושת , with sum and avg
 // TODO report - add סולר
 
@@ -10,6 +10,7 @@
 // TODO report - enlarge screen space
 // TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)
 // TODO report - dont red color all the cell
+// TODO report - צלמים : show by date
 
 // TODO backup - all collections, dont overwrite existing backup file
 // TODO report - שצל - fix removing redundant columns

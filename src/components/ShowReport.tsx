@@ -4,6 +4,7 @@ import { Tabs } from "@mantine/core";
 
 import { GeneralReport } from "./GeneralReport";
 import { ShetzelReport } from "./ShetzelReport.tsx";
+import { IdReport } from "./IdReport.tsx";
 
 Object.assign(LicenseManager.prototype, {
   validateLicense: () => true,
@@ -19,6 +20,7 @@ const ShowReport = () => {
         <Tabs.Tab value="general">הדוח המלא</Tabs.Tab>
         <Tabs.Tab value="shetzel">שצל</Tabs.Tab>
         <Tabs.Tab value="ids">צלמים</Tabs.Tab>
+        <Tabs.Tab value="radio-ids">צלמי קשר</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value="general" pt="xs">
@@ -28,7 +30,10 @@ const ShowReport = () => {
         <ShetzelReport />
       </Tabs.Panel>
       <Tabs.Panel value="ids" pt="xs">
-        <i>בקרוב יגיע...</i>
+        <IdReport screenName="וידוא צלמים" />
+      </Tabs.Panel>
+      <Tabs.Panel value="radio-ids" pt="xs">
+        <IdReport screenName="וידוא צלמי קשר" />
       </Tabs.Panel>
     </Tabs>
   );

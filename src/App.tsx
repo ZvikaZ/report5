@@ -1,11 +1,11 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO report - צלמים : verify comparing to previous report
-// TODO report - add תחמושת , with sum and avg
+// TODO report - תחמושת : with sum and avg
 // TODO report - add סולר
+// TODO ScreenReport: replace | with newline
 
-// TODO report - add deficit report
+// TODO report - add tasks report
 // TODO report - fix batteries coloring (and verify all columns)
 // TODO report - enlarge screen space
 // TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)

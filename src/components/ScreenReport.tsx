@@ -13,7 +13,7 @@ import { questionsData } from "./questions-data.js";
 import { AG_GRID_LOCALE_IL } from "@ag-grid-community/locale";
 import { endOfDay, subDays } from "date-fns";
 
-const IdReport = ({ screenName }) => {
+const ScreenReport = ({ screenName }) => {
   const [rowData, setRowData] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
 
@@ -92,9 +92,8 @@ const IdReport = ({ screenName }) => {
             ) {
               return (
                 <span style={{ color: "red" }}>
-                  ישן: {formatValue(previousValue)}
-                  <br />
-                  חדש: {formatValue(latestValue)}
+                  ישן: {formatValue(previousValue)} | חדש:{" "}
+                  {formatValue(latestValue)}
                 </span>
               );
             }
@@ -123,4 +122,4 @@ const IdReport = ({ screenName }) => {
   );
 };
 
-export { IdReport };
+export { ScreenReport };

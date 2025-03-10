@@ -5,6 +5,7 @@ import { Tabs } from "@mantine/core";
 import { GeneralReport } from "./GeneralReport";
 import { ShetzelReport } from "./ShetzelReport.tsx";
 import { ScreenReport } from "./ScreenReport.tsx";
+import { FuelReport } from "./FuelReport.tsx";
 
 Object.assign(LicenseManager.prototype, {
   validateLicense: () => true,
@@ -22,6 +23,7 @@ const ShowReport = () => {
         <Tabs.Tab value="ids">צלמים</Tabs.Tab>
         <Tabs.Tab value="radio-ids">צלמי קשר</Tabs.Tab>
         <Tabs.Tab value="ammo">תחמושת</Tabs.Tab>
+        <Tabs.Tab value="fuel">סולר</Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel value="general" pt="xs">
@@ -38,6 +40,9 @@ const ShowReport = () => {
       </Tabs.Panel>
       <Tabs.Panel value="ammo" pt="xs">
         <ScreenReport screenName="תחמושת" showSummary={true} />
+      </Tabs.Panel>
+      <Tabs.Panel value="fuel" pt="xs">
+        <FuelReport />
       </Tabs.Panel>
     </Tabs>
   );

@@ -189,8 +189,8 @@ const GeneralReport = () => {
         margin: "1px 0",
       };
 
-      return (
-        <div key={issue.failure} style={style}>
+      return issue.failure ? (
+        <div key={issue.failure + issue.creationDate} style={style}>
           {issue.failure}{" "}
           <span
             style={{
@@ -201,6 +201,8 @@ const GeneralReport = () => {
             [{daysSince} ימים]
           </span>
         </div>
+      ) : (
+        ""
       );
     });
   };

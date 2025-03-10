@@ -358,6 +358,27 @@ const GeneralReport = () => {
     params.api.autoSizeAllColumns();
   };
 
+  const restoreColumnsState = (params) => {
+    const savedState = localStorage.getItem("GeneralReportColumnState");
+    console.log("restoring");
+    if (savedState) {
+      const columnState = JSON.parse(savedState);
+      params.api.applyColumnState({
+        state: columnState,
+        applyOrder: true,
+      });
+    }
+  };
+
+  const saveColumnsState = (event) => {
+    console.log("saving", event);
+    const columnState = event.api.getColumnState();
+    localStorage.setItem(
+      "GeneralReportColumnState",
+      JSON.stringify(columnState),
+    );
+  };
+
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       <AgGridReact
@@ -368,6 +389,9 @@ const GeneralReport = () => {
         enableRtl={true}
         theme={myTheme}
         onFirstDataRendered={onFirstDataRendered}
+        onColumnVisible={saveColumnsState}
+        onColumnMoved={saveColumnsState}
+        onGridReady={restoreColumnsState}
         cellSelection={true}
         suppressSetFilterByDefault={true} //TODO remove this, and fix set filter
       />

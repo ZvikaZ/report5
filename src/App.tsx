@@ -1,7 +1,6 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO report - add סולר
 // TODO report - add tasks report
 
 // TODO report - fix batteries coloring (and verify all columns)
@@ -14,7 +13,6 @@
 // TODO report - auto resize, like GeneralReport (not working for other reports)
 // TODO backup - all collections, dont overwrite existing backup file
 // TODO report - שצל - fix removing redundant columns
-// TODO report - remember column hiding and ordering
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
 // TODO report - maybe use context menu for interesting things (also, add missing default actions)
 // TODO issues - make optional bold

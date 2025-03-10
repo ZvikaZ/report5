@@ -37,7 +37,7 @@ const ShowReport = () => {
         <ScreenReport screenName="וידוא צלמי קשר" />
       </Tabs.Panel>
       <Tabs.Panel value="ammo" pt="xs">
-        <ScreenReport screenName="תחמושת" />
+        <ScreenReport screenName="תחמושת" showSummary={true} />
       </Tabs.Panel>
     </Tabs>
   );

@@ -1,17 +1,17 @@
 // user's permission is in 'allowedEmails' collection
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
-// TODO report - תחמושת : with sum and avg
 // TODO report - add סולר
-// TODO ScreenReport: replace | with newline
-
 // TODO report - add tasks report
+
 // TODO report - fix batteries coloring (and verify all columns)
 // TODO report - enlarge screen space
 // TODO report - add columns for Mizrahi, such as סיווג and  סטטוס חוליה (verify the last one)
 // TODO report - dont red color all the cell
 // TODO report - צלמים : show by date
+// TODO ScreenReport: replace | with newline
 
+// TODO report - auto resize, like GeneralReport (not working for other reports)
 // TODO backup - all collections, dont overwrite existing backup file
 // TODO report - שצל - fix removing redundant columns
 // TODO report - remember column hiding and ordering

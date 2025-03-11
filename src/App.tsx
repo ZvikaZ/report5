@@ -2,6 +2,7 @@
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
 // TODO report - add tasks report
+// TODO remove null issues (e.g. 401)
 
 // TODO report - fix batteries coloring (and verify all columns)
 // TODO report - enlarge screen space

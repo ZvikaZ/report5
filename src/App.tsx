@@ -10,7 +10,6 @@
 // TODO report - צלמים : show by date
 // TODO ScreenReport: replace | with newline
 
-// TODO report - auto resize, like GeneralReport (not working for other reports)
 // TODO backup - all collections, dont overwrite existing backup file
 // TODO report - שצל - fix removing redundant columns
 // TODO report - https://www.ag-grid.com/react-data-grid/filter-quick/
@@ -21,6 +20,7 @@
 // TODO separate DBs for prod and dev, with indication for dev
 // TODO backup DB automatically
 
+// TODO add wrapper component above aggrid, remove duplicate code, and cloneElement from ShowReport
 // TODO fix 'npm build' (and then fix firebase-hosting-merge.yml)
 // TODO PWA
 // TODO clean warnings

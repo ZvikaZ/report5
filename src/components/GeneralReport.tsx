@@ -141,7 +141,7 @@ const redColorRanges = {
   },
 };
 
-const GeneralReport = () => {
+const GeneralReport = ({ onFirstDataRendered }) => {
   const [rowData, setRowData] = useState([]);
 
   const defaultColDef = {
@@ -353,10 +353,6 @@ const GeneralReport = () => {
 
     fetchData();
   }, [tankIds]);
-
-  const onFirstDataRendered = (params) => {
-    params.api.autoSizeAllColumns();
-  };
 
   const restoreColumnsState = (params) => {
     const savedState = localStorage.getItem("GeneralReportColumnState");

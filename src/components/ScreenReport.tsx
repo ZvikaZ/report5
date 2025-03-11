@@ -13,7 +13,11 @@ import { questionsData } from "./questions-data.js";
 import { AG_GRID_LOCALE_IL } from "@ag-grid-community/locale";
 import { endOfDay, subDays } from "date-fns";
 
-const ScreenReport = ({ screenName, showSummary = false }) => {
+const ScreenReport = ({
+  onFirstDataRendered,
+  screenName,
+  showSummary = false,
+}) => {
   const [rowData, setRowData] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
 
@@ -197,6 +201,7 @@ const ScreenReport = ({ screenName, showSummary = false }) => {
         enableRtl={true}
         cellSelection={true}
         getRowStyle={getRowStyle}
+        onFirstDataRendered={onFirstDataRendered}
       />
     </div>
   );

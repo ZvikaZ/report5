@@ -18,7 +18,7 @@ const myTheme = themeQuartz.withParams({
   spacing: 4,
 });
 
-function ShetzelReport() {
+function ShetzelReport({ onFirstDataRendered }) {
   const [rowData, setRowData] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
 
@@ -93,11 +93,6 @@ function ShetzelReport() {
 
     fetchData();
   }, []);
-
-  const onFirstDataRendered = (params) => {
-    // params.api.autoSizeAllColumns();   //TODO doesnt work. why?
-    params.api.redrawRows(); // Ensure rows are properly rendered
-  };
 
   // Custom cell renderer to style the summary row
   const getRowStyle = (params) => {

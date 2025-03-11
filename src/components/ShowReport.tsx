@@ -1,5 +1,5 @@
 import { LicenseManager } from "ag-grid-enterprise";
-import { useState } from "react";
+import { useState, useRef, cloneElement, useEffect } from "react";
 import { Tabs } from "@mantine/core";
 
 import { GeneralReport } from "./GeneralReport";
@@ -14,36 +14,64 @@ Object.assign(LicenseManager.prototype, {
 
 const ShowReport = () => {
   const [activeTab, setActiveTab] = useState("general");
+  const gridRefs = useRef({});
+
+  const onFirstDataRendered = (params, tabKey) => {
+    gridRefs.current[tabKey] = params.api;
+    params.api.autoSizeAllColumns();
+  };
+
+  useEffect(() => {
+    const gridApi = gridRefs.current[activeTab];
+    if (gridApi) {
+      gridApi.autoSizeAllColumns();
+    }
+  }, [activeTab]); // Runs after activeTab changes and DOM updates
+
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+  };
+
+  // Define tab configurations
+  const tabs = [
+    { value: "general", label: "הדוח המלא", component: <GeneralReport /> },
+    { value: "shetzel", label: "שצל", component: <ShetzelReport /> },
+    {
+      value: "ids",
+      label: "צלמים",
+      component: <ScreenReport screenName="וידוא צלמים" />,
+    },
+    {
+      value: "radio-ids",
+      label: "צלמי קשר",
+      component: <ScreenReport screenName="וידוא צלמי קשר" />,
+    },
+    {
+      value: "ammo",
+      label: "תחמושת",
+      component: <ScreenReport screenName="תחמושת" showSummary={true} />,
+    },
+    { value: "fuel", label: "סולר", component: <FuelReport /> },
+  ];
 
   return (
-    <Tabs value={activeTab} onChange={setActiveTab} defaultValue="general">
+    <Tabs value={activeTab} onChange={handleTabChange} defaultValue="general">
       <Tabs.List>
-        <Tabs.Tab value="general">הדוח המלא</Tabs.Tab>
-        <Tabs.Tab value="shetzel">שצל</Tabs.Tab>
-        <Tabs.Tab value="ids">צלמים</Tabs.Tab>
-        <Tabs.Tab value="radio-ids">צלמי קשר</Tabs.Tab>
-        <Tabs.Tab value="ammo">תחמושת</Tabs.Tab>
-        <Tabs.Tab value="fuel">סולר</Tabs.Tab>
+        {tabs.map((tab) => (
+          <Tabs.Tab key={tab.value} value={tab.value}>
+            {tab.label}
+          </Tabs.Tab>
+        ))}
       </Tabs.List>
 
-      <Tabs.Panel value="general" pt="xs">
-        <GeneralReport />
-      </Tabs.Panel>
-      <Tabs.Panel value="shetzel" pt="xs">
-        <ShetzelReport />
-      </Tabs.Panel>
-      <Tabs.Panel value="ids" pt="xs">
-        <ScreenReport screenName="וידוא צלמים" />
-      </Tabs.Panel>
-      <Tabs.Panel value="radio-ids" pt="xs">
-        <ScreenReport screenName="וידוא צלמי קשר" />
-      </Tabs.Panel>
-      <Tabs.Panel value="ammo" pt="xs">
-        <ScreenReport screenName="תחמושת" showSummary={true} />
-      </Tabs.Panel>
-      <Tabs.Panel value="fuel" pt="xs">
-        <FuelReport />
-      </Tabs.Panel>
+      {tabs.map((tab) => (
+        <Tabs.Panel key={tab.value} value={tab.value} pt="xs">
+          {cloneElement(tab.component, {
+            onFirstDataRendered: (params) =>
+              onFirstDataRendered(params, tab.value),
+          })}
+        </Tabs.Panel>
+      ))}
     </Tabs>
   );
 };

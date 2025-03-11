@@ -78,7 +78,7 @@ const redColorRanges = {
   },
 };
 
-const FuelReport = () => {
+const FuelReport = ({ onFirstDataRendered }) => {
   const [rowData, setRowData] = useState([]);
 
   const defaultColDef = {
@@ -209,6 +209,7 @@ const FuelReport = () => {
         theme={myTheme}
         getRowStyle={getRowStyle}
         cellSelection={true}
+        onFirstDataRendered={onFirstDataRendered}
       />
     </div>
   );

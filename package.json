@@ -14,7 +14,7 @@
     "@ag-grid-community/locale": "^33.1.1",
     "@mantine/core": "^7.16.3",
     "@mantine/hooks": "^7.16.3",
-    "@mantine/notifications": "^7.17.0",
+    "@mantine/notifications": "^7.17.2",
     "@tabler/icons-react": "^3.30.0",
     "ag-grid-enterprise": "^33.1.1",
     "ag-grid-react": "^33.1.1",

@@ -40,6 +40,7 @@
 
 import "@mantine/core/styles.css";
 import { Button, Container, MantineProvider, Stack, Box } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { useState } from "react";
 import { User } from "firebase/auth";
 import {
@@ -94,6 +95,7 @@ const AppContent = ({
 
   return (
     <MantineProvider>
+      <Notifications />
       <Container size="xl" px="sm" pt="md">
         <Stack>
           <Box maw={768}>

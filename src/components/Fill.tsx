@@ -13,7 +13,7 @@ import {
   Textarea,
   TextInput,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import {
   serverTimestamp,
   collection,
@@ -35,16 +35,67 @@ import {
 
 import { questionsData } from "./questions-data.js";
 import { Issues } from "./Issues.tsx";
-import { ReportPopup } from "./ReportPopup.tsx";
 import { db } from "../firebaseConfig.ts";
 
-const saveData = async (key, value) => {
-  try {
-    console.log("saving", { key, value });
-    const docRef = await addDoc(collection(db, key), value);
-    console.log("Document written with ID: ", docRef.id, docRef);
-  } catch (e) {
-    console.error("Error adding document: ", e);
+const SUPPORT_CONTACT = "צביקה";
+
+const saveData = async (key, value, retries = 100, delay = 500) => {
+  notifications.clean();
+  const loadingNotification = notifications.show({
+    loading: true,
+    title: "שומר נתונים",
+    message: "הנתונים נשמרים, אנא המתן...",
+    autoClose: false,
+    withBorder: true,
+    styles: {
+      root: {
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)", // Center on screen
+        zIndex: 1000, // Ensure it stays on top
+      },
+    },
+  });
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      console.log(`Attempt ${attempt} of ${retries}: saving`, { key, value });
+
+      const docRef = await addDoc(collection(db, key), value);
+      console.log("Document written with ID: ", docRef.id);
+
+      notifications.clean();
+      notifications.show({
+        title: "הנתונים נשמרו בהצלחה",
+        message: "המידע נשמר בהצלחה במערכת.",
+        color: "green",
+        autoClose: false,
+        position: "top-right",
+      });
+
+      return docRef;
+    } catch (e) {
+      console.error(`Attempt ${attempt} failed: `, e);
+
+      // If not the last attempt, wait before retrying
+      if (attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      // If all retries failed, hide loading and show error
+      notifications.hide(loadingNotification);
+      notifications.show({
+        title: "שגיאה בשמירת הנתונים",
+        message: `לא הצלחנו לשמור את הנתונים לאחר מספר ניסיונות. אנא נסה שוב מאוחר יותר או פנה ל-${SUPPORT_CONTACT}.`,
+        color: "red",
+        autoClose: false,
+        position: "top-right",
+      });
+
+      throw e; // Re-throw the error
+    }
   }
 };
 
@@ -109,8 +160,6 @@ const Screen = ({
   onFinish,
 }) => {
   const navigate = useNavigate();
-  const [popupOpened, { open: openPopup, close: closePopup }] =
-    useDisclosure(false);
 
   const renderInput = (question) => {
     const key = getQuestionKey(question);
@@ -203,15 +252,14 @@ const Screen = ({
     }
   };
 
-  const onFinishClick = () => {
-    saveData("tankStatus", {
+  const onFinishClick = async () => {
+    await saveData("tankStatus", {
       ...answers,
       tankId: answers["צ. הטנק"],
       timestamp: serverTimestamp(),
       user: user.email,
-      displayName: user.displayName ?? "John Doe",
+      displayName: user.displayName,
     });
-    openPopup();
     onFinish();
   };
 
@@ -268,16 +316,8 @@ const Screen = ({
             הבא
           </Button>
         ) : (
-          // <Button onClick={onFinishClick}>סיים</Button>
-          <>{/*  TODO return Button after ReportPopup will be removed*/}</>
+          <Button onClick={onFinishClick}>סיים</Button>
         )}
-        <ReportPopup
-          opened={popupOpened}
-          onClose={closePopup}
-          answers={answers}
-          onFinishClick={onFinishClick}
-          showButton={screenIndex === questionsData.screens.length - 1}
-        />
       </Group>
     </div>
   );

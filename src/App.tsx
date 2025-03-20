@@ -2,6 +2,7 @@
 // note that I dropped: נשקים אישיים (עם שמות אנשי הצוות)-
 
 // TODO report - add tasks report
+// TODO report - show מפלג tankId
 // TODO remove null issues (e.g. 401)
 
 // TODO report - fix batteries coloring (and verify all columns)
@@ -30,6 +31,7 @@
 // TODO auto report mails
 // TODO return from Report to Main
 
+// TODO ability to report single Id
 // TODO upload questions to DB
 // TODO report - make it more generic
 // TODO km and hours shouldnt decrease, and Z shouldn't change, unless warning issued

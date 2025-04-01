@@ -6,7 +6,7 @@ export const questionsData = {
         {
           type: "select",
           text: "צ. הטנק",
-          options: ["425", "417", "191", "401", "435", "404", "024"],
+          options: ["425", "417", "191", "401", "435", "404", "024", "378"],
           id: true,
         },
         { type: "text", text: "שילוט", description: "איך הטנק משולט בפועל" },

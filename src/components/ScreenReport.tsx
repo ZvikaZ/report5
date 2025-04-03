@@ -7,12 +7,15 @@ import {
   orderBy,
   limit,
   getDocs,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig.ts";
 import { questionsData } from "./questions-data.js";
 import { AG_GRID_LOCALE_IL } from "@ag-grid-community/locale";
-import { endOfDay, subDays, differenceInCalendarDays } from "date-fns";
+import { endOfDay, subDays, differenceInCalendarDays, startOfDay } from "date-fns";
 import { themeQuartz } from "ag-grid-community";
+import { TimeNavigation } from "./TimeNavigation";
+import { useTimeNavigation } from "../hooks/useTimeNavigation";
 
 const myTheme = themeQuartz.withParams({
   spacing: 4,
@@ -46,6 +49,26 @@ const ScreenReport = ({
 }) => {
   const [rowData, setRowData] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
+  const [latestTimestamp, setLatestTimestamp] = useState<Timestamp | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Use the time navigation hook
+  const {
+    currentTimestamp,
+    currentDate,
+    goToTimestamp,
+    goToDate,
+    goToPrevChange,
+    goToNextChange,
+    goToPrevDay,
+    goToNextDay,
+    goToCurrent,
+    canGoPrevChange,
+    canGoNextChange,
+    canGoPrevDay,
+    canGoNextDay,
+    isAtLatest,
+  } = useTimeNavigation();
 
   // Extract tankIds from questionsData
   const tankIds =
@@ -55,30 +78,51 @@ const ScreenReport = ({
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       const results = [];
 
       for (const tankId of tankIds) {
-        // Fetch the latest record
-        const latestQuery = query(
-          collection(db, "tankStatus"),
-          where("tankId", "==", tankId),
-          orderBy("timestamp", "desc"),
-          limit(1),
-        );
+        let latestQuery;
+        
+        if (currentTimestamp) {
+          // If we have a specific time to show, fetch data up to that point
+          latestQuery = query(
+            collection(db, "tankStatus"),
+            where("tankId", "==", tankId),
+            where("timestamp", "<=", currentTimestamp),
+            orderBy("timestamp", "desc"),
+            limit(1),
+          );
+        } else {
+          // Otherwise fetch the latest data
+          latestQuery = query(
+            collection(db, "tankStatus"),
+            where("tankId", "==", tankId),
+            orderBy("timestamp", "desc"),
+            limit(1),
+          );
+        }
+        
         const latestSnapshot = await getDocs(latestQuery);
         let latestData = null;
         latestSnapshot.forEach((doc) => {
           latestData = { tankId, ...doc.data() };
         });
 
-        // Fetch the previous record (latest from yesterday or before)
+        // For the "previous" data for comparison, always use data from the day before
+        // the current timestamp or today if no timestamp is selected
+        const comparisonDate = currentTimestamp 
+          ? subDays(currentTimestamp.toDate(), 1)
+          : subDays(new Date(), 1);
+          
         const previousQuery = query(
           collection(db, "tankStatus"),
           where("tankId", "==", tankId),
-          where("timestamp", "<=", endOfDay(subDays(new Date(), 1))),
+          where("timestamp", "<=", endOfDay(comparisonDate)),
           orderBy("timestamp", "desc"),
           limit(1),
         );
+        
         const previousSnapshot = await getDocs(previousQuery);
         let previousData = null;
         previousSnapshot.forEach((doc) => {
@@ -90,6 +134,35 @@ const ScreenReport = ({
             ...latestData,
             previous: previousData || {},
           });
+        }
+      }
+
+      // Update the latest timestamp if we're fetching current data
+      if (!currentTimestamp && results.length > 0) {
+        // Find the most recent timestamp among all results
+        let maxTimestamp = results[0].timestamp;
+        results.forEach(result => {
+          if (result.timestamp && (!maxTimestamp || result.timestamp.seconds > maxTimestamp.seconds)) {
+            maxTimestamp = result.timestamp;
+          }
+        });
+        
+        if (maxTimestamp) {
+          setLatestTimestamp(maxTimestamp);
+          
+          // Collect historical timestamps to populate history
+          const timestamps = [...new Set(results
+            .filter(result => result.timestamp)
+            .map(result => result.timestamp))]
+            .sort((a, b) => a.seconds - b.seconds);
+          
+          // Initialize time navigation with historical data
+          if (timestamps.length > 0) {
+            // Add timestamps to history in chronological order
+            timestamps.forEach(ts => {
+              goToTimestamp(ts);
+            });
+          }
         }
       }
 
@@ -196,7 +269,7 @@ const ScreenReport = ({
               averageRow[q.text] = "N/A";
             }
           }
-          // For string fields
+          // For string fieldsno
           else if (typeof fieldValues[0] === "string") {
             const uniqueValues = [...new Set(fieldValues)];
             const valueCounts = uniqueValues.map((value) => {
@@ -213,10 +286,11 @@ const ScreenReport = ({
       }
 
       setRowData(results);
+      setIsLoading(false);
     };
 
     fetchData();
-  }, [screenName, tankIds, showSummary]);
+  }, [screenName, tankIds, showSummary, currentTimestamp, goToTimestamp]);
 
   const defaultColDef = {
     wrapText: true,
@@ -249,6 +323,20 @@ const ScreenReport = ({
 
   return (
     <div style={{ height: "100vh", width: "100%" }}>
+      <TimeNavigation
+        onPrevChange={goToPrevChange}
+        onNextChange={goToNextChange}
+        onPrevDay={goToPrevDay}
+        onNextDay={goToNextDay}
+        onCurrent={goToCurrent}
+        canGoPrevChange={canGoPrevChange}
+        canGoNextChange={canGoNextChange}
+        canGoPrevDay={canGoPrevDay}
+        canGoNextDay={canGoNextDay}
+        isAtLatest={isAtLatest}
+        currentDate={currentDate}
+        isLoading={isLoading}
+      />
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}

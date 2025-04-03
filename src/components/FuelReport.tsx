@@ -30,7 +30,7 @@ import {
   themeQuartz,
 } from "ag-grid-community";
 import { TimeNavigation } from "./TimeNavigation";
-import { useTimeNavigation } from "../hooks/useTimeNavigation";
+import { useTimeNavigation } from "../hooks/useTimeNavigation.ts";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { differenceInCalendarDays } from "date-fns";
 import {
@@ -143,6 +143,10 @@ const redColorRanges = {
     },
   },
 };
+
+// Keep track of grid API outside component to persist through renders
+let gridApi = null;
+console.log('Module-level gridApi initialized:', gridApi);
 
 const GeneralReport = ({ onFirstDataRendered }) => {
   const [rowData, setRowData] = useState([]);
@@ -335,7 +339,6 @@ const GeneralReport = ({ onFirstDataRendered }) => {
     .find((screen) => screen.screen === "כללי")
     .questions.find((q) => q.text === "צ. הטנק").options;
 
-  // Fetch latest status for each tankId and user display names
   useEffect(() => {
     const fetchData = async () => {
       const promises = tankIds.map(async (tankId) => {
@@ -404,6 +407,7 @@ const GeneralReport = ({ onFirstDataRendered }) => {
       }
       
       setRowData(filteredResults);
+      console.log('setRowData called with', filteredResults.length, 'rows');
     };
 
     fetchData();
@@ -411,7 +415,6 @@ const GeneralReport = ({ onFirstDataRendered }) => {
 
   const restoreColumnsState = (params) => {
     const savedState = localStorage.getItem("GeneralReportColumnState");
-    console.log("restoring");
     if (savedState) {
       const columnState = JSON.parse(savedState);
       params.api.applyColumnState({
@@ -422,13 +425,18 @@ const GeneralReport = ({ onFirstDataRendered }) => {
   };
 
   const saveColumnsState = (event) => {
-    console.log("saving", event);
     const columnState = event.api.getColumnState();
     localStorage.setItem(
       "GeneralReportColumnState",
-      JSON.stringify(columnState),
+      JSON.stringify(columnState)
     );
   };
+
+  // AG-Grid state persistence - keeps column state between data changes
+  const getGridState = () => {
+    const savedState = localStorage.getItem("GeneralReportColumnState");
+    return savedState ? JSON.parse(savedState) : null;
+  }
 
   return (
     <div style={{ height: "100vh", width: "100%" }}>
@@ -458,7 +466,8 @@ const GeneralReport = ({ onFirstDataRendered }) => {
         onColumnMoved={saveColumnsState}
         onGridReady={restoreColumnsState}
         cellSelection={true}
-        suppressSetFilterByDefault={true} //TODO remove this, and fix set filter
+        suppressSetFilterByDefault={true}
+        maintainColumnOrder={true}
       />
     </div>
   );

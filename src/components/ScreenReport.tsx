@@ -76,6 +76,27 @@ const ScreenReport = ({
       .flatMap((screen) => screen.questions)
       .find((question) => question.text === "צ. הטנק")?.options || [];
 
+  // Save column state to localStorage
+  const saveColumnsState = (event) => {
+    const columnState = event.api.getColumnState();
+    localStorage.setItem(
+      `ScreenReport_${screenName}_ColumnState`,
+      JSON.stringify(columnState)
+    );
+  };
+
+  // Restore column state from localStorage
+  const restoreColumnsState = (params) => {
+    const savedState = localStorage.getItem(`ScreenReport_${screenName}_ColumnState`);
+    if (savedState) {
+      const columnState = JSON.parse(savedState);
+      params.api.applyColumnState({
+        state: columnState,
+        applyOrder: true,
+      });
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -347,6 +368,10 @@ const ScreenReport = ({
         cellSelection={true}
         getRowStyle={getRowStyle}
         onFirstDataRendered={onFirstDataRendered}
+        onColumnVisible={saveColumnsState}
+        onColumnMoved={saveColumnsState}
+        onGridReady={restoreColumnsState}
+        maintainColumnOrder={true}
       />
     </div>
   );

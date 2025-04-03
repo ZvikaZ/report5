@@ -161,6 +161,27 @@ const FuelReport = ({ onFirstDataRendered }) => {
     .find((screen) => screen.screen === "כללי")
     .questions.find((q) => q.text === "צ. הטנק").options;
 
+  // Save column state to localStorage
+  const saveColumnsState = (event) => {
+    const columnState = event.api.getColumnState();
+    localStorage.setItem(
+      "FuelReportColumnState",
+      JSON.stringify(columnState)
+    );
+  };
+
+  // Restore column state from localStorage
+  const restoreColumnsState = (params) => {
+    const savedState = localStorage.getItem("FuelReportColumnState");
+    if (savedState) {
+      const columnState = JSON.parse(savedState);
+      params.api.applyColumnState({
+        state: columnState,
+        applyOrder: true,
+      });
+    }
+  };
+
   // Fetch latest status for each tankId and calculate summary
   useEffect(() => {
     const fetchData = async () => {
@@ -281,6 +302,10 @@ const FuelReport = ({ onFirstDataRendered }) => {
         getRowStyle={getRowStyle}
         cellSelection={true}
         onFirstDataRendered={onFirstDataRendered}
+        onColumnVisible={saveColumnsState}
+        onColumnMoved={saveColumnsState}
+        onGridReady={restoreColumnsState}
+        maintainColumnOrder={true}
       />
     </div>
   );

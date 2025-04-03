@@ -8,6 +8,7 @@ import {
   orderBy,
   query,
   where,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig.ts";
 import { questionsData } from "./questions-data.js";
@@ -28,6 +29,8 @@ import {
   ValidationModule,
   themeQuartz,
 } from "ag-grid-community";
+import { TimeNavigation } from "./TimeNavigation";
+import { useTimeNavigation } from "../hooks/useTimeNavigation";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -80,6 +83,26 @@ const redColorRanges = {
 
 const FuelReport = ({ onFirstDataRendered }) => {
   const [rowData, setRowData] = useState([]);
+  const [latestTimestamp, setLatestTimestamp] = useState<Timestamp | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Use the time navigation hook
+  const {
+    currentTimestamp,
+    currentDate,
+    goToTimestamp,
+    goToDate,
+    goToPrevChange,
+    goToNextChange,
+    goToPrevDay,
+    goToNextDay,
+    goToCurrent,
+    canGoPrevChange,
+    canGoNextChange,
+    canGoPrevDay,
+    canGoNextDay,
+    isAtLatest,
+  } = useTimeNavigation();
 
   const defaultColDef = {
     wrapText: true,
@@ -141,13 +164,29 @@ const FuelReport = ({ onFirstDataRendered }) => {
   // Fetch latest status for each tankId and calculate summary
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       const promises = tankIds.map(async (tankId) => {
-        const q = query(
-          collection(db, "tankStatus"),
-          where("tankId", "==", tankId),
-          orderBy("timestamp", "desc"),
-          limit(1),
-        );
+        let q;
+        
+        if (currentTimestamp) {
+          // If we have a specific timestamp, fetch data at that time
+          q = query(
+            collection(db, "tankStatus"),
+            where("tankId", "==", tankId),
+            where("timestamp", "<=", currentTimestamp),
+            orderBy("timestamp", "desc"),
+            limit(1),
+          );
+        } else {
+          // Otherwise, fetch the latest data
+          q = query(
+            collection(db, "tankStatus"),
+            where("tankId", "==", tankId),
+            orderBy("timestamp", "desc"),
+            limit(1),
+          );
+        }
+        
         const snapshot = await getDocs(q);
         if (snapshot.docs.length === 0) {
           return { tankId, timestamp: null };
@@ -162,6 +201,23 @@ const FuelReport = ({ onFirstDataRendered }) => {
       const filteredResults = results.filter(
         (result) => result.timestamp !== null,
       );
+
+      // Update the latest timestamp if we're fetching current data
+      if (!currentTimestamp && filteredResults.length > 0) {
+        // Find the most recent timestamp among all results
+        let maxTimestamp = filteredResults[0].timestamp;
+        filteredResults.forEach(result => {
+          if (result.timestamp && (!maxTimestamp || result.timestamp.seconds > maxTimestamp.seconds)) {
+            maxTimestamp = result.timestamp;
+          }
+        });
+        
+        if (maxTimestamp) {
+          setLatestTimestamp(maxTimestamp);
+          // Initialize time navigation with the latest timestamp
+          goToTimestamp(maxTimestamp);
+        }
+      }
 
       // Calculate total missing fuel
       const totalMissingFuel = filteredResults.reduce((sum, row) => {
@@ -180,10 +236,11 @@ const FuelReport = ({ onFirstDataRendered }) => {
       console.log({ totalMissingFuel, summaryRow });
 
       setRowData([...filteredResults, summaryRow]);
+      setIsLoading(false);
     };
 
     fetchData();
-  }, [tankIds]);
+  }, [tankIds, currentTimestamp, goToTimestamp]);
 
   // Custom styling for the summary row
   const getRowStyle = (params) => {
@@ -200,6 +257,20 @@ const FuelReport = ({ onFirstDataRendered }) => {
 
   return (
     <div style={{ height: "100vh", width: "100%" }}>
+      <TimeNavigation
+        onPrevChange={goToPrevChange}
+        onNextChange={goToNextChange}
+        onPrevDay={goToPrevDay}
+        onNextDay={goToNextDay}
+        onCurrent={goToCurrent}
+        canGoPrevChange={canGoPrevChange}
+        canGoNextChange={canGoNextChange}
+        canGoPrevDay={canGoPrevDay}
+        canGoNextDay={canGoNextDay}
+        isAtLatest={isAtLatest}
+        currentDate={currentDate}
+        isLoading={isLoading}
+      />
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}

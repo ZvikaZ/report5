@@ -11,7 +11,33 @@ import {
 import { db } from "../firebaseConfig.ts";
 import { questionsData } from "./questions-data.js";
 import { AG_GRID_LOCALE_IL } from "@ag-grid-community/locale";
-import { endOfDay, subDays } from "date-fns";
+import { endOfDay, subDays, differenceInCalendarDays } from "date-fns";
+import { themeQuartz } from "ag-grid-community";
+
+const myTheme = themeQuartz.withParams({
+  spacing: 4,
+});
+
+// Function for gradual red: lower value = more red, higher value = less red
+const getGradualRedStyle = (value, min, max) => {
+  if (value == null) return {};
+  const clampedValue = Math.max(min, Math.min(max, value));
+  const intensity = 1 - (clampedValue - min) / (max - min); // 1 at min (red), 0 at max (white)
+  return {
+    backgroundColor: `rgba(255, 0, 0, ${intensity})`,
+    display: "inline-block",
+    padding: "0 4px",
+  };
+};
+
+const redColorRanges = {
+  timestamp: {
+    min: 0,
+    max: 2,
+    getValue: (params) =>
+      2 - differenceInCalendarDays(new Date(), params.value?.toDate()), // Invert: today = 2 (white), 2 days ago = 0 (red)
+  },
+};
 
 const ScreenReport = ({
   onFirstDataRendered,
@@ -75,6 +101,19 @@ const ScreenReport = ({
 
       const columnDefs = [
         { field: "tankId", headerName: "צ. הטנק", pinned: "right" },
+        {
+          field: "timestamp",
+          headerName: "תאריך",
+          filter: "agDateColumnFilter",
+          valueFormatter: (params) => {
+            if (!params.value || params.data.isSummary || params.data.isAverage) return "";
+            const date = params.value.toDate();
+            return date.toLocaleString("he-IL", {
+              dateStyle: "short",
+              timeStyle: "short",
+            });
+          },
+        },
         ...screenData.questions.map((q) => ({
           field: q.text,
           headerName: q.text,
@@ -179,6 +218,22 @@ const ScreenReport = ({
     fetchData();
   }, [screenName, tankIds, showSummary]);
 
+  const defaultColDef = {
+    wrapText: true,
+    autoHeight: true,
+    sortable: true,
+    filter: true,
+    cellStyle: (params) => {
+      const field = params.colDef.field;
+      if (redColorRanges[field]) {
+        const { min, max, getValue } = redColorRanges[field];
+        const value = getValue(params);
+        return { ...getGradualRedStyle(value, min, max), whiteSpace: "pre" };
+      }
+      return { whiteSpace: "pre" };
+    },
+  };
+
   // Custom row styling function matching your existing implementation
   const getRowStyle = (params) => {
     if (params.data && (params.data.isSummary || params.data.isAverage)) {
@@ -197,8 +252,10 @@ const ScreenReport = ({
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
+        defaultColDef={defaultColDef}
         localeText={AG_GRID_LOCALE_IL}
         enableRtl={true}
+        theme={myTheme}
         cellSelection={true}
         getRowStyle={getRowStyle}
         onFirstDataRendered={onFirstDataRendered}

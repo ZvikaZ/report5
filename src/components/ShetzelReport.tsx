@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { AG_GRID_LOCALE_IL } from "@ag-grid-community/locale";
 import { themeQuartz } from "ag-grid-community";
+import { FirstDataRenderedEvent } from "ag-grid-community";
 
 const db = getFirestore();
 
@@ -18,7 +19,7 @@ const myTheme = themeQuartz.withParams({
   spacing: 4,
 });
 
-function ShetzelReport({ onFirstDataRendered }) {
+function ShetzelReport({ onFirstDataRendered }: { onFirstDataRendered?: (params: FirstDataRenderedEvent) => void }) {
   const [rowData, setRowData] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);
 

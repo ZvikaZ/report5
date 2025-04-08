@@ -16,6 +16,10 @@ import { endOfDay, subDays, differenceInCalendarDays, startOfDay } from "date-fn
 import { themeQuartz } from "ag-grid-community";
 import { TimeNavigation } from "./TimeNavigation";
 import { useTimeNavigation } from "../hooks/useTimeNavigation";
+import { FirstDataRenderedEvent } from "ag-grid-community";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { getReports } from "../services/firebase";
 
 const myTheme = themeQuartz.withParams({
   spacing: 4,
@@ -43,9 +47,13 @@ const redColorRanges = {
 };
 
 const ScreenReport = ({
-  onFirstDataRendered,
   screenName,
   showSummary = false,
+  onFirstDataRendered,
+}: {
+  screenName: string;
+  showSummary?: boolean;
+  onFirstDataRendered?: (params: FirstDataRenderedEvent) => void;
 }) => {
   const [rowData, setRowData] = useState([]);
   const [columnDefs, setColumnDefs] = useState([]);

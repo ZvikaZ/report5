@@ -1,22 +1,31 @@
 import { LicenseManager } from "ag-grid-enterprise";
 import { useState, useRef, cloneElement, useEffect } from "react";
 import { Tabs } from "@mantine/core";
+import { GridApi, FirstDataRenderedEvent } from "ag-grid-community";
+import { AgGridReact } from "ag-grid-react";
 
 import { GeneralReport } from "./GeneralReport";
 import { ShetzelReport } from "./ShetzelReport.tsx";
 import { ScreenReport } from "./ScreenReport.tsx";
 import { FuelReport } from "./FuelReport.tsx";
+import { SummaryReport } from "./SummaryReport.tsx";
 
 Object.assign(LicenseManager.prototype, {
   validateLicense: () => true,
   isDisplayWatermark: () => false,
 });
 
+interface TabConfig {
+  value: string;
+  label: string;
+  component: React.ReactElement;
+}
+
 const ShowReport = () => {
   const [activeTab, setActiveTab] = useState("general");
-  const gridRefs = useRef({});
+  const gridRefs = useRef<Record<string, GridApi>>({});
 
-  const onFirstDataRendered = (params, tabKey) => {
+  const onFirstDataRendered = (params: FirstDataRenderedEvent, tabKey: string) => {
     gridRefs.current[tabKey] = params.api;
     params.api.autoSizeAllColumns();
   };
@@ -28,12 +37,14 @@ const ShowReport = () => {
     }
   }, [activeTab]); // Runs after activeTab changes and DOM updates
 
-  const handleTabChange = (newTab) => {
-    setActiveTab(newTab);
+  const handleTabChange = (newTab: string | null) => {
+    if (newTab) {
+      setActiveTab(newTab);
+    }
   };
 
   // Define tab configurations
-  const tabs = [
+  const tabs: TabConfig[] = [
     { value: "general", label: "הדוח המלא", component: <GeneralReport /> },
     { value: "shetzel", label: "שצל", component: <ShetzelReport /> },
     {
@@ -52,6 +63,7 @@ const ShowReport = () => {
       component: <ScreenReport screenName="תחמושת" showSummary={true} />,
     },
     { value: "fuel", label: "סולר", component: <FuelReport /> },
+    { value: "summary", label: "סיכום", component: <SummaryReport /> },
   ];
 
   return (
@@ -67,7 +79,7 @@ const ShowReport = () => {
       {tabs.map((tab) => (
         <Tabs.Panel key={tab.value} value={tab.value} pt="xs">
           {cloneElement(tab.component, {
-            onFirstDataRendered: (params) =>
+            onFirstDataRendered: (params: FirstDataRenderedEvent) =>
               onFirstDataRendered(params, tab.value),
           })}
         </Tabs.Panel>

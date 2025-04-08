@@ -28,6 +28,7 @@ import {
   ModuleRegistry,
   ValidationModule,
   themeQuartz,
+  FirstDataRenderedEvent,
 } from "ag-grid-community";
 import { TimeNavigation } from "./TimeNavigation";
 import { useTimeNavigation } from "../hooks/useTimeNavigation.ts";
@@ -81,7 +82,7 @@ const redColorRanges = {
   },
 };
 
-const FuelReport = ({ onFirstDataRendered }) => {
+const FuelReport = ({ onFirstDataRendered }: { onFirstDataRendered?: (params: FirstDataRenderedEvent) => void }) => {
   const [rowData, setRowData] = useState([]);
   const [latestTimestamp, setLatestTimestamp] = useState<Timestamp | null>(null);
   const [isLoading, setIsLoading] = useState(false);

@@ -30,9 +30,13 @@ import {
   ModuleRegistry,
   ValidationModule,
   themeQuartz,
+  FirstDataRenderedEvent,
 } from "ag-grid-community";
 import { TimeNavigation } from "./TimeNavigation";
 import { useTimeNavigation } from "../hooks/useTimeNavigation";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { getReports } from "../services/firebase";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -148,7 +152,7 @@ const redColorRanges = {
 let gridApi = null;
 console.log('Module-level gridApi initialized:', gridApi);
 
-const GeneralReport = ({ onFirstDataRendered }) => {
+const GeneralReport = ({ onFirstDataRendered }: { onFirstDataRendered?: (params: FirstDataRenderedEvent) => void }) => {
   const [rowData, setRowData] = useState([]);
   const [latestTimestamp, setLatestTimestamp] = useState<Timestamp | null>(null);
   
